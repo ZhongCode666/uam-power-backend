@@ -5,46 +5,53 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 )
 
 var (
-	mutex     sync.Mutex
-	logger    *log.Logger
-	logDir    = "./logs" // 日志文件存放的目录
-	logPrefix = "log-"   // 日志文件名前缀
+	mutex      sync.Mutex
+	logger     *log.Logger
+	loggerFile *log.Logger
+	logDir     = "./logs" // 日志文件存放的目录
+	logPrefix  = "log-"   // 日志文件名前缀
 )
 
 // Log 结构体
-type Log struct{}
-
-// NewLog 创建一个新的 Log 实例
-func NewLog() *Log {
-	return &Log{}
+type Log struct {
+	LogFile bool
 }
 
 // Init 初始化日志系统，设置日志文件
-func (l *Log) Init() error {
-	// 获取当前时间，并格式化为日志文件名
-	//now := time.Now()
-	//logFileName := fmt.Sprintf("%s/%s%s.log", logDir, logPrefix, now.Format("20060102150405"))
-
-	// 确保日志目录存在
+func (l *Log) Init(logFile bool) error {
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		err := os.MkdirAll(logDir, 0755)
 		if err != nil {
 			return fmt.Errorf("failed to create log directory: %v", err)
 		}
 	}
-
-	// 打开日志文件，文件不存在则创建
-	//file, err := os.OpenFile(logFileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
-	//if err != nil {
-	//	return fmt.Errorf("failed to open log file: %v", err)
-	//}
-
-	// 使用 log.New 创建一个 Logger
-	//logger = log.New(file, "", log.Ldate|log.Ltime|log.Lmicroseconds)
 	logger = log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	// 获取当前时间，并格式化为日志文件名
+	if logFile {
+		now := time.Now()
+		logFileName := fmt.Sprintf("%s/%s%s.log", logDir, logPrefix, now.Format("20060102150405"))
+
+		// 确保日志目录存在
+		if _, err := os.Stat(logDir); os.IsNotExist(err) {
+			err := os.MkdirAll(logDir, 0755)
+			if err != nil {
+				return fmt.Errorf("failed to create log directory: %v", err)
+			}
+		}
+
+		// 打开日志文件，文件不存在则创建
+		file, err := os.OpenFile(logFileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+		if err != nil {
+			return fmt.Errorf("failed to open log file: %v", err)
+		}
+		l.LogFile = logFile
+		// 使用 log.New 创建一个 Logger
+		loggerFile = log.New(file, "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	}
 	return nil
 }
 
@@ -55,6 +62,9 @@ func (l *Log) Write(message string) {
 
 	// 输出日志，带时间戳
 	logger.Println(message)
+	if l.LogFile {
+		loggerFile.Println(message)
+	}
 }
 
 func (l *Log) Info(message string) {
@@ -80,8 +90,8 @@ func (l *Log) Close() {
 
 var LogInfo Log
 
-func InitLog() {
-	err := LogInfo.Init()
+func InitLog(logFile bool) {
+	err := LogInfo.Init(logFile)
 	if err != nil {
 		return
 	}
