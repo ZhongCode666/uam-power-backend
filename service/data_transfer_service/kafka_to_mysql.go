@@ -104,6 +104,7 @@ func (ser *KafkaToMysql) KafkaStatusToMysql() {
 			utils.MsgError("        [KafkaToMysql]Can not insert! err>" + err.Error())
 			continue
 		}
+		utils.MsgError("        [KafkaToMysql]successfully insert status!")
 	}
 	ser.StatusDone <- true
 }
@@ -114,7 +115,7 @@ func (ser *KafkaToMysql) KafkaEventToMysql() {
 		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 		KafkaRe, err := ser.KafkaEventConsumerService.ReceiveMessage(ctx)
 		if err != nil {
-			utils.MsgError("        [KafkaToMysql]KafkaEventToMysql receive msg error")
+			utils.MsgError("        [KafkaToMysql]KafkaEventToMysql receive msg error err>" + err.Error())
 			continue
 		}
 		var reStruct data_flow_model.AircraftEvent
@@ -139,6 +140,7 @@ func (ser *KafkaToMysql) KafkaEventToMysql() {
 			utils.MsgError("        [KafkaToMysql]KafkaEventToMysql failed to insert!")
 			continue
 		}
+		utils.MsgSuccess("        [KafkaToMysql]KafkaEventToMysql successfully insert!")
 	}
 	ser.EventDone <- true
 }
