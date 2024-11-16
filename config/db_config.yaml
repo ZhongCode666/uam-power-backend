@@ -1,0 +1,19 @@
+KafkaCfg:
+  Addr: "175.178.125.164:9092"
+  AircraftDataTopic: "AircraftData"
+  AircraftEventTopic: "AircraftEvent"
+RedisCfg:
+  Port: 6379
+  StatusDBno: 5
+  EventDBno: 6
+  AircraftDBno: 7
+  TaskInfoDBno: 8
+  Host: "119.29.181.98"
+MySqlCfg:
+  Usr: "root"
+  Psw: "Zhonglaoshizhen6!"
+  Host: "gz-cdb-1n3w64q3.sql.tencentcdb.com"
+  DB: "systemdb"
+  FlightDB: "flightdb"
+  EventDB: "eventdb"
+  Port: 25100
