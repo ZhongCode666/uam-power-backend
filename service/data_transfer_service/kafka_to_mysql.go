@@ -1,10 +1,12 @@
-package data_transfer_service
+package main
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
+	"sync"
 	"time"
 	"uam-power-backend/models/config_models/db_config_model"
 	"uam-power-backend/models/controller_models/aircraft_task_model"
@@ -22,6 +24,7 @@ type KafkaToMysql struct {
 	StopFlag                   bool
 	StatusDone                 chan bool
 	EventDone                  chan bool
+	wg                         sync.WaitGroup
 }
 
 func NewKafkaToMysql(
@@ -60,15 +63,17 @@ func NewKafkaToMysql(
 		StatusDone:                 make(chan bool),
 		EventDone:                  make(chan bool),
 		StopFlag:                   false,
+		wg:                         sync.WaitGroup{},
 	}
 }
 
 func (ser *KafkaToMysql) KafkaStatusToMysql() {
+	utils.MsgSuccess("        [KafkaToMysql]start KafkaStatusToMysql successfully!")
 	for !ser.StopFlag {
-		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
 		KafkaRe, err := ser.KafkaStatusConsumerService.ReceiveMessage(ctx)
 		if err != nil {
-			utils.MsgError("        [KafkaToMysql]receive msg error >" + err.Error())
+			utils.MsgError("        [KafkaToMysql]receive msg error")
 			continue
 		}
 
@@ -98,21 +103,22 @@ func (ser *KafkaToMysql) KafkaStatusToMysql() {
 			mysqlData.TrackTable, reStruct.Longitude, reStruct.Latitude, reStruct.Altitude, reStruct.Yaw,
 			reStruct.TimeString,
 		)
-		utils.MsgInfo("SQL>" + sql)
+		//utils.MsgInfo("SQL>" + sql)
 		_, err = ser.MysqlStatusService.ExecuteCmd(sql)
 		if err != nil {
 			utils.MsgError("        [KafkaToMysql]Can not insert! err>" + err.Error())
 			continue
 		}
-		utils.MsgError("        [KafkaToMysql]successfully insert status!")
+		utils.MsgSuccess("        [KafkaToMysql]successfully insert status!")
 	}
 	ser.StatusDone <- true
+	ser.wg.Done()
 }
 
 func (ser *KafkaToMysql) KafkaEventToMysql() {
+	utils.MsgSuccess("        [KafkaToMysql]start KafkaEventToMysql successfully!")
 	for !ser.StopFlag {
-		utils.MsgSuccess("        [KafkaToMysql]start KafkaEventToMysql successfully!")
-		ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, _ := context.WithTimeout(context.Background(), 1*time.Second)
 		KafkaRe, err := ser.KafkaEventConsumerService.ReceiveMessage(ctx)
 		if err != nil {
 			utils.MsgError("        [KafkaToMysql]KafkaEventToMysql receive msg error err>" + err.Error())
@@ -143,6 +149,7 @@ func (ser *KafkaToMysql) KafkaEventToMysql() {
 		utils.MsgSuccess("        [KafkaToMysql]KafkaEventToMysql successfully insert!")
 	}
 	ser.EventDone <- true
+	ser.wg.Done()
 }
 
 func (ser *KafkaToMysql) Stop() {
@@ -154,4 +161,28 @@ func (ser *KafkaToMysql) Stop() {
 func (ser *KafkaToMysql) Start() {
 	go ser.KafkaStatusToMysql()
 	go ser.KafkaEventToMysql()
+}
+
+func main() {
+	utils.MsgInfo("    [KafkaToMysql]Process ready to start")
+	//print("    [KafkaToMysql]Process ready to start")
+	args := os.Args[1]
+
+	cfg, _ := utils.LoadDBConfig(args)
+
+	// 获取从主进程传递过来的参数
+	ser := NewKafkaToMysql(&cfg.KafkaCfg, &cfg.MySqlCfg, &cfg.RedisCfg)
+	ser.wg.Add(2)
+	ser.Start()
+	ser.wg.Wait()
+	utils.MsgSuccess("    [KafkaToMysql]Process successfully started!")
+	var input string
+	_, err := fmt.Scan(&input)
+	if err != nil {
+		return
+	}
+
+	ser.Stop()
+	utils.MsgSuccess("    [KafkaToMysql]Process successfully stopped!")
+
 }

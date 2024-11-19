@@ -2,9 +2,11 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strconv"
 	"uam-power-backend/routes"
-	"uam-power-backend/service/data_transfer_service"
 	"uam-power-backend/utils"
 )
 
@@ -14,7 +16,6 @@ func main() {
 		return
 	}
 	// 初始化日志
-	utils.InitLog(GlobalCfg.SaveLogToFile)
 
 	cfg, loadCfgErr := utils.LoadDBConfig(GlobalCfg.DBConfigPath)
 	if loadCfgErr != nil {
@@ -29,15 +30,29 @@ func main() {
 	routes.SetupAircraftTaskRoutes(r, &cfg.RedisCfg, &cfg.MySqlCfg)
 	routes.SetupAircraftIdRoutes(r, &cfg.RedisCfg, &cfg.MySqlCfg)
 	utils.MsgSuccess("[main_server]init routes successfully!")
-	var redisTransferGroup []*data_transfer_service.KafkaToRedis
+	RedisTransfer, _ := filepath.Abs("service/data_transfer_service/kafka_to_redis.go")
+	MySqlTransfer, _ := filepath.Abs("service/data_transfer_service/kafka_to_mysql.go")
+	currentDir, _ := os.Getwd()
 	for i := 0; i < GlobalCfg.KafkaPartitionNum; i++ {
-		redisTransferGroup = append(redisTransferGroup, data_transfer_service.NewKafkaToRedis(&cfg.KafkaCfg, &cfg.RedisCfg))
-		redisTransferGroup[i].Start()
+		cmd := exec.Command("go", "run", RedisTransfer, GlobalCfg.DBConfigPath)
+		cmd.Dir = currentDir
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Start()
+		if err != nil {
+			return
+		}
 	}
-	var mysqlTransferGroup []*data_transfer_service.KafkaToMysql
+
 	for i := 0; i < GlobalCfg.KafkaPartitionNum; i++ {
-		mysqlTransferGroup = append(mysqlTransferGroup, data_transfer_service.NewKafkaToMysql(&cfg.KafkaCfg, &cfg.MySqlCfg, &cfg.RedisCfg))
-		mysqlTransferGroup[i].Start()
+		cmd := exec.Command("go", "run", MySqlTransfer, GlobalCfg.DBConfigPath)
+		cmd.Dir = currentDir
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		err := cmd.Start()
+		if err != nil {
+			return
+		}
 	}
 
 	utils.MsgSuccess("[main_server]init transfer service successfully!")

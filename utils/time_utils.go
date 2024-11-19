@@ -11,6 +11,13 @@ func GetTimeStr() string {
 	return formattedTime
 }
 
+func GetTimeFmtStr() string {
+	currentTime := time.Now()
+	// 定义格式化样式
+	formattedTime := currentTime.Format("[2006-01-02 15:04:05.012345]")
+	return formattedTime
+}
+
 func GetMySqlTimeStr() string {
 	now := time.Now()
 	return now.Format("2006-01-02 15:04:05.000000")
