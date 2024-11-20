@@ -122,11 +122,11 @@ func main() {
 	ser.Start()
 	utils.MsgSuccess("    [KafkaToRedis]Process successfully started!")
 	ser.wg.Wait()
-	var input string
-	_, err := fmt.Scan(&input)
-	if err != nil {
-		return
-	}
+	//var input string
+	//_, err := fmt.Scan(&input)
+	//if err != nil {
+	//	return
+	//}
 	ser.Stop()
 	utils.MsgSuccess("    [KafkaToRedis]Process successfully stopped!")
 }

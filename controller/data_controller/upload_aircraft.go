@@ -3,6 +3,7 @@ package data_controller
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"uam-power-backend/models/config_models/db_config_model"
 	"uam-power-backend/models/controller_models/data_flow_model"
 	"uam-power-backend/service/db_service"
@@ -24,63 +25,55 @@ func NewUploadAircraftController(kafkaConfig *db_config_model.KafkaConfigModel) 
 	}
 }
 
-func (controller *UploadAircraftController) UploadData(c *gin.Context) {
+func (controller *UploadAircraftController) UploadData(c *fiber.Ctx) error {
 	var aircraftData data_flow_model.AircraftStatus
-	if err := c.ShouldBindJSON(&aircraftData); err != nil {
+	if err := c.BodyParser(&aircraftData); err != nil {
 		utils.MsgError("        [UploadAircraftController]UploadData error-Invalid JSON data rec >" + err.Error())
-		c.JSON(400, gin.H{"msg": "Invalid JSON data"})
-		return
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
 	if !utils.IsValidSqlTimeFormat(aircraftData.TimeString) {
 		utils.MsgError("        [UploadAircraftController]UploadData error-Invalid time format")
-		c.JSON(403, gin.H{"msg": "Invalid time format"})
-		return
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid time format"})
 	}
 	jStr, err := json.Marshal(aircraftData)
 	if err != nil {
 		utils.MsgError("        [UploadAircraftController]UploadData error-Invalid JSON data tran_str >" + err.Error())
-		c.JSON(400, gin.H{"msg": "Invalid JSON data"})
-		return
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
 	err = controller.kafkaStatusService.SendMessage(string(jStr))
 	if err != nil {
 		utils.MsgInfo(err.Error())
 		utils.MsgError("        [UploadAircraftController]UploadData error-Invalid JSON data >" + err.Error())
-		c.JSON(400, gin.H{"msg": "Invalid JSON data"})
-		return
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
 	utils.MsgSuccess("        [UploadAircraftController]UploadData successfully!")
-	c.JSON(200, gin.H{"msg": "Successfully send to Kafka!"})
+	return c.Status(fiber.StatusOK).JSON(gin.H{"msg": "Successfully send to Kafka!"})
 }
 
-func (controller *UploadAircraftController) UploadEvent(c *gin.Context) {
+func (controller *UploadAircraftController) UploadEvent(c *fiber.Ctx) error {
 	var aircraftEvent data_flow_model.AircraftEvent
 
 	// 绑定 JSON 数据到结构体
-	if err := c.ShouldBindJSON(&aircraftEvent); err != nil {
+	if err := c.BodyParser(&aircraftEvent); err != nil {
 		utils.MsgError("        [UploadAircraftController]UploadEvent error-Invalid JSON data >" + err.Error())
-		c.JSON(400, gin.H{"msg": "Invalid JSON data"})
-		return
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
 	if !utils.IsValidSqlTimeFormat(aircraftEvent.TimeString) {
 		utils.MsgError("        [UploadAircraftController]UploadEvent error-Invalid time format")
-		c.JSON(403, gin.H{"msg": "Invalid time format"})
-		return
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid time format"})
 	}
 	jStr, err := json.Marshal(aircraftEvent)
 	if err != nil {
 		utils.MsgError("        [UploadAircraftController]UploadEvent error-Invalid JSON data >" + err.Error())
-		c.JSON(400, gin.H{"msg": "Invalid JSON data"})
-		return
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
 	err = controller.kafkaEventService.SendMessage(string(jStr))
 	if err != nil {
 		utils.MsgError("        [UploadAircraftController]UploadEvent error-Invalid JSON data >" + err.Error())
-		c.JSON(400, gin.H{"msg": "Invalid JSON data"})
-		return
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
 	utils.MsgSuccess("        [UploadAircraftController]UploadEvent successfully!")
-	c.JSON(200, gin.H{"msg": "Successfully send to Kafka!"})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully send to Kafka!"})
 }
 
 func (controller *UploadAircraftController) Close() {

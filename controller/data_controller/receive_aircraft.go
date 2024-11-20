@@ -1,7 +1,7 @@
 package data_controller
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"strconv"
 	"uam-power-backend/models/config_models/db_config_model"
 	"uam-power-backend/models/controller_models/data_flow_model"
@@ -21,44 +21,38 @@ func NewReceiveAircraft(redisConfig *db_config_model.RedisConfigModel) *RequestA
 	return &RequestAircraft{StatusRedisService: redisStatusService, EventRedisService: redisEventService}
 }
 
-func (receiver *RequestAircraft) RequestAircraftStatus(c *gin.Context) {
+func (receiver *RequestAircraft) RequestAircraftStatus(c *fiber.Ctx) error {
 	var aircraftReq data_flow_model.RecAircraftStatusRequest
 
 	// 绑定 JSON 数据到结构体
-	if err := c.ShouldBindJSON(&aircraftReq); err != nil {
+	if err := c.BodyParser(&aircraftReq); err != nil {
 		utils.MsgError("        [ReceiveAircraft]RequestAircraftStatus Invalid JSON data! >" + err.Error())
-		c.JSON(400, gin.H{"msg": "Invalid JSON data"})
-		return
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
 
 	rec, err := receiver.StatusRedisService.Get(strconv.Itoa(aircraftReq.AircraftID))
 	if err != nil || rec == nil {
 		utils.MsgError("        [ReceiveAircraft]RequestAircraftStatus Invalid JSON data!")
-		c.JSON(404, gin.H{"msg": "N.A.!"})
-		return
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "N.A.!"})
 	}
 	utils.MsgError("        [ReceiveAircraft]RequestAircraftStatus Invalid JSON data!")
-	c.JSON(200, gin.H{"msg": "Successfully requestData!", "data": rec})
-	return
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully requestData!", "data": rec})
 }
 
-func (receiver *RequestAircraft) RequestAircraftEvent(c *gin.Context) {
+func (receiver *RequestAircraft) RequestAircraftEvent(c *fiber.Ctx) error {
 	var aircraftReq data_flow_model.RecAircraftStatusRequest
 
 	// 绑定 JSON 数据到结构体
-	if err := c.ShouldBindJSON(&aircraftReq); err != nil {
+	if err := c.BodyParser(&aircraftReq); err != nil {
 		utils.MsgError("        [ReceiveAircraft]RequestAircraftEvent Invalid JSON data! >" + err.Error())
-		c.JSON(400, gin.H{"msg": "Invalid JSON data"})
-		return
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
 
 	rec, err := receiver.EventRedisService.Get(strconv.Itoa(aircraftReq.AircraftID))
 	if err != nil || rec == nil {
 		utils.MsgError("        [ReceiveAircraft]RequestAircraftEvent Invalid JSON data!")
-		c.JSON(404, gin.H{"msg": "N.A.!"})
-		return
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "N.A.!"})
 	}
 	utils.MsgSuccess("        [ReceiveAircraft]RequestAircraftEvent Successfully requestData!")
-	c.JSON(200, gin.H{"msg": "Successfully requestData!", "data": rec})
-	return
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully requestData!", "data": rec})
 }

@@ -139,7 +139,7 @@ func (ser *KafkaToMysql) KafkaEventToMysql() {
 		var mysqlData aircraft_task_model.MysqlAircraftTask
 		err = json.Unmarshal(jsonData, &mysqlData)
 		_, err = ser.MysqlEventService.ExecuteCmd(
-			fmt.Sprintf("INSERT INTO eventdb.%s(DataTime, Event) VALUES ('%s', '%s')",
+			fmt.Sprintf("INSERT INTO %s(DataTime, Event) VALUES ('%s', '%s')",
 				mysqlData.EventTable, reStruct.TimeString, reStruct.Event,
 			))
 		if err != nil {
@@ -176,12 +176,6 @@ func main() {
 	ser.Start()
 	ser.wg.Wait()
 	utils.MsgSuccess("    [KafkaToMysql]Process successfully started!")
-	var input string
-	_, err := fmt.Scan(&input)
-	if err != nil {
-		return
-	}
-
 	ser.Stop()
 	utils.MsgSuccess("    [KafkaToMysql]Process successfully stopped!")
 

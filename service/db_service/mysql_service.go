@@ -3,7 +3,6 @@ package dbservice
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"time"
 )
 
 type MySQLService struct {
@@ -20,11 +19,11 @@ func NewMySQLService(dsn string) (*MySQLService, error) {
 	}
 	// 配置数据库连接池
 	// 设置最大打开连接数
-	db.SetMaxOpenConns(50) // 根据实际需求调整
+	db.SetMaxOpenConns(1000) // 根据实际需求调整
 	// 设置最大空闲连接数
-	db.SetMaxIdleConns(10) // 根据实际需求调整
+	db.SetMaxIdleConns(50) // 根据实际需求调整
 	// 设置连接的最大生命周期
-	db.SetConnMaxLifetime(30 * time.Minute) // 连接最大生命周期为30分钟
+	//db.SetConnMaxLifetime(30 * time.Minute) // 连接最大生命周期为30分钟
 	return &MySQLService{db: db}, nil
 }
 
