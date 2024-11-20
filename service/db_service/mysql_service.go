@@ -3,6 +3,7 @@ package dbservice
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 type MySQLService struct {
@@ -17,6 +18,7 @@ func NewMySQLService(dsn string) (*MySQLService, error) {
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
+	db.SetConnMaxLifetime(5 * time.Second)
 	return &MySQLService{db: db}, nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/go-redis/redis/v8"
 	"strconv"
+	"time"
 )
 
 type RedisDict struct {
@@ -16,8 +17,9 @@ type RedisDict struct {
 // NewRedisDict initializes a new RedisDict instance
 func NewRedisDict(host string, port int, db int) *RedisDict {
 	rdb := redis.NewClient(&redis.Options{
-		Addr: host + ":" + strconv.Itoa(port),
-		DB:   db,
+		Addr:        host + ":" + strconv.Itoa(port),
+		DB:          db,
+		IdleTimeout: 30 * time.Second,
 	})
 	return &RedisDict{
 		client: rdb,
