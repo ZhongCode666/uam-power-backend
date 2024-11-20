@@ -1,10 +1,9 @@
-package main
+package data_transfer_service
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -111,22 +110,22 @@ func (ser *KafkaToRedis) Start() {
 	go ser.KafkaEventToRedis()
 }
 
-func main() {
-	utils.MsgInfo("    [KafkaToRedis]Process ready to start")
-	args := os.Args[1]
-	cfg, _ := utils.LoadDBConfig(args)
-
-	// 获取从主进程传递过来的参数
-	ser := NewKafkaToRedis(&cfg.KafkaCfg, &cfg.RedisCfg)
-	ser.wg.Add(2)
-	ser.Start()
-	utils.MsgSuccess("    [KafkaToRedis]Process successfully started!")
-	ser.wg.Wait()
-	//var input string
-	//_, err := fmt.Scan(&input)
-	//if err != nil {
-	//	return
-	//}
-	ser.Stop()
-	utils.MsgSuccess("    [KafkaToRedis]Process successfully stopped!")
-}
+//func main() {
+//	utils.MsgInfo("    [KafkaToRedis]Process ready to start")
+//	args := os.Args[1]
+//	cfg, _ := utils.LoadDBConfig(args)
+//
+//	// 获取从主进程传递过来的参数
+//	ser := NewKafkaToRedis(&cfg.KafkaCfg, &cfg.RedisCfg)
+//	ser.wg.Add(2)
+//	ser.Start()
+//	utils.MsgSuccess("    [KafkaToRedis]Process successfully started!")
+//	ser.wg.Wait()
+//	//var input string
+//	//_, err := fmt.Scan(&input)
+//	//if err != nil {
+//	//	return
+//	//}
+//	ser.Stop()
+//	utils.MsgSuccess("    [KafkaToRedis]Process successfully stopped!")
+//}

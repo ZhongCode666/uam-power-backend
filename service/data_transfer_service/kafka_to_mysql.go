@@ -1,10 +1,9 @@
-package main
+package data_transfer_service
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"sync"
 	"time"
@@ -163,20 +162,20 @@ func (ser *KafkaToMysql) Start() {
 	go ser.KafkaEventToMysql()
 }
 
-func main() {
-	utils.MsgInfo("    [KafkaToMysql]Process ready to start")
-	//print("    [KafkaToMysql]Process ready to start")
-	args := os.Args[1]
-
-	cfg, _ := utils.LoadDBConfig(args)
-
-	// 获取从主进程传递过来的参数
-	ser := NewKafkaToMysql(&cfg.KafkaCfg, &cfg.MySqlCfg, &cfg.RedisCfg)
-	ser.wg.Add(2)
-	ser.Start()
-	ser.wg.Wait()
-	utils.MsgSuccess("    [KafkaToMysql]Process successfully started!")
-	ser.Stop()
-	utils.MsgSuccess("    [KafkaToMysql]Process successfully stopped!")
-
-}
+//func main() {
+//	utils.MsgInfo("    [KafkaToMysql]Process ready to start")
+//	//print("    [KafkaToMysql]Process ready to start")
+//	args := os.Args[1]
+//
+//	cfg, _ := utils.LoadDBConfig(args)
+//
+//	// 获取从主进程传递过来的参数
+//	ser := NewKafkaToMysql(&cfg.KafkaCfg, &cfg.MySqlCfg, &cfg.RedisCfg)
+//	ser.wg.Add(2)
+//	ser.Start()
+//	ser.wg.Wait()
+//	utils.MsgSuccess("    [KafkaToMysql]Process successfully started!")
+//	ser.Stop()
+//	utils.MsgSuccess("    [KafkaToMysql]Process successfully stopped!")
+//
+//}
