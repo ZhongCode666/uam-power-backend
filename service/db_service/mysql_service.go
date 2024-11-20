@@ -17,13 +17,6 @@ func NewMySQLService(dsn string) (*MySQLService, error) {
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
-	// 配置数据库连接池
-	// 设置最大打开连接数
-	db.SetMaxOpenConns(1000) // 根据实际需求调整
-	// 设置最大空闲连接数
-	db.SetMaxIdleConns(50) // 根据实际需求调整
-	// 设置连接的最大生命周期
-	//db.SetConnMaxLifetime(30 * time.Minute) // 连接最大生命周期为30分钟
 	return &MySQLService{db: db}, nil
 }
 
