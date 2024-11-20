@@ -3,7 +3,6 @@ package dbservice
 import (
 	"context"
 	"github.com/segmentio/kafka-go"
-	"time"
 )
 
 // KafkaProducer 封装 Kafka 生产者
@@ -14,12 +13,10 @@ type KafkaProducer struct {
 // NewKafkaProducer 创建一个新的 Kafka 生产者
 func NewKafkaProducer(addr, topic string) *KafkaProducer {
 	writer := &kafka.Writer{
-		Addr:         kafka.TCP(addr),
-		Topic:        topic,
-		Balancer:     &kafka.LeastBytes{},
-		Async:        true,
-		BatchSize:    32768, // 批次大小（消息数）
-		BatchTimeout: 100 * time.Millisecond,
+		Addr:     kafka.TCP(addr),
+		Topic:    topic,
+		Balancer: &kafka.LeastBytes{},
+		Async:    true,
 	}
 	return &KafkaProducer{writer: writer}
 }
