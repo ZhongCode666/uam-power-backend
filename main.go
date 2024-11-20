@@ -4,11 +4,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"strconv"
 	"uam-power-backend/routes"
+	"uam-power-backend/service/data_transfer_service"
 	"uam-power-backend/utils"
 )
 
 func main() {
-	GlobalCfg, loadCfgErr := utils.LoadGlobalConfig("config/global_config.yaml")
+	GlobalConfigPath := "config/global_config.yaml"
+	GlobalCfg, loadCfgErr := utils.LoadGlobalConfig(GlobalConfigPath)
+	data_transfer_service.StartDataTransferService(GlobalConfigPath)
 	if loadCfgErr != nil {
 		return
 	}

@@ -1,15 +1,14 @@
-package main
+package data_transfer_service
 
 import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"sync"
 	"uam-power-backend/utils"
 )
 
-func main() {
-	GlobalCfg, loadCfgErr := utils.LoadGlobalConfig("config/global_config.yaml")
+func StartDataTransferService(ConfigPath string) {
+	GlobalCfg, loadCfgErr := utils.LoadGlobalConfig(ConfigPath)
 	if loadCfgErr != nil {
 		return
 	}
@@ -38,7 +37,4 @@ func main() {
 		}
 	}
 	utils.MsgSuccess("[main_transfer_server]init transfer service successfully!")
-	var wg sync.WaitGroup
-	wg.Add(1)
-	wg.Wait()
 }
