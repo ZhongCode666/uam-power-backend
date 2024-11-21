@@ -34,14 +34,14 @@ func NewKafkaToClickhouse(
 	kafkaEvent := dbservice.NewKafkaConsumer(KafkaConfig.Addr, KafkaConfig.AircraftEventTopic, "KafkaToMysql")
 	FlightClickHouseService, FlightErr := dbservice.NewClickHouse(
 		ClickHouseConfig.Host, ClickHouseConfig.Port, ClickHouseConfig.Username, ClickHouseConfig.Password,
-		ClickHouseConfig.BatchSize, ClickHouseConfig.FlushPeriod, ClickHouseConfig.FlightDatabase, false,
+		ClickHouseConfig.BatchSize, ClickHouseConfig.FlushPeriod, ClickHouseConfig.FlightDatabase, true,
 		ClickHouseConfig.FlightColumn)
 	if FlightErr != nil {
 		return nil
 	}
 	EventClickHouseService, EventErr := dbservice.NewClickHouse(
 		ClickHouseConfig.Host, ClickHouseConfig.Port, ClickHouseConfig.Username, ClickHouseConfig.Password,
-		ClickHouseConfig.BatchSize, ClickHouseConfig.FlushPeriod, ClickHouseConfig.EventDatabase, false,
+		ClickHouseConfig.EventBatchSize, ClickHouseConfig.EventFlushPeriod, ClickHouseConfig.EventDatabase, true,
 		ClickHouseConfig.EventColumn)
 	if EventErr != nil {
 		return nil
@@ -93,7 +93,7 @@ func (ser *KafkaToClickhouse) KafkaStatusToClickhouse() {
 			utils.MsgError("        [KafkaToClickhouse]KafkaStatusToClickhouse Invalid Json!")
 			continue
 		}
-		err = ser.ClickHouseStatusService.InsertOne(
+		err = ser.ClickHouseStatusService.Add(
 			mysqlData.TrackTable,
 			[]string{"Longitude", "Latitude", "Altitude", "Yaw", "DataTime"},
 			[]interface{}{reStruct.Longitude, reStruct.Latitude, reStruct.Altitude, reStruct.Yaw, reStruct.TimeString},
@@ -131,7 +131,7 @@ func (ser *KafkaToClickhouse) KafkaEventToClickhouse() {
 		jsonData, _ := json.Marshal(re)
 		var mysqlData aircraft_task_model.MysqlAircraftTask
 		err = json.Unmarshal(jsonData, &mysqlData)
-		err = ser.ClickHouseStatusService.InsertOne(
+		err = ser.ClickHouseStatusService.Add(
 			mysqlData.EventTable,
 			[]string{"DataTime", "Event"},
 			[]interface{}{reStruct.TimeString, reStruct.Event},

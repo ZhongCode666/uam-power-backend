@@ -24,7 +24,9 @@ ClickHouseCfg:
   Password: zhonglaoshizhen6
   FlightDatabase: flightdb
   EventDatabase: eventdb
-  BatchSize: 5
-  FlushPeriod: 10
+  BatchSize: 1000
+  EventBatchSize: 10
+  FlushPeriod: 30
+  EventFlushPeriod: 30
   FlightColumn: ["Longitude", "Latitude", "Altitude", "Yaw", "DataTime"]
   EventColumn: ["DataTime", "Event"]
