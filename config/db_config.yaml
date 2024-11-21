@@ -1,5 +1,5 @@
 KafkaCfg:
-  Addr: "175.178.125.164:9092"
+  Addr: "127.0.0.1:9092"
   AircraftDataTopic: "AircraftData10Area"
   AircraftEventTopic: "AircraftEvent10Area"
 RedisCfg:
@@ -8,12 +8,23 @@ RedisCfg:
   EventDBno: 6
   AircraftDBno: 7
   TaskInfoDBno: 8
-  Host: "119.29.181.98"
+  Host: "127.0.0.1"
 MySqlCfg:
   Usr: "root"
   Psw: "Zhonglaoshizhen6!"
   Host: "127.0.0.1"
   DB: "systemdb"
   FlightDB: "flightdb"
-  EventDB: "flighteventdb"
+  EventDB: "eventdb"
   Port: 3306
+ClickHouseCfg:
+  Host: "127.0.0.1"
+  Port: 9000
+  Username: default
+  Password: zhonglaoshizhen6
+  FlightDatabase: flightdb
+  EventDatabase: eventdb
+  BatchSize: 50
+  FlushPeriod: 30
+  FlightColumn: ["Longitude", "Latitude", "Altitude", "Yaw", "DataTime"]
+  EventColumn: ["DataTime", "Event"]

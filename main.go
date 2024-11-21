@@ -26,10 +26,15 @@ func main() {
 		redisTransferGroup = append(redisTransferGroup, data_transfer_service.NewKafkaToRedis(&cfg.KafkaCfg, &cfg.RedisCfg))
 		redisTransferGroup[i].Start()
 	}
-	var mysqlTransferGroup []*data_transfer_service.KafkaToMysql
+	//var mysqlTransferGroup []*data_transfer_service.KafkaToMysql
+	//for i := 0; i < GlobalCfg.KafkaPartitionNum; i++ {
+	//	mysqlTransferGroup = append(mysqlTransferGroup, data_transfer_service.NewKafkaToMysql(&cfg.KafkaCfg, &cfg.MySqlCfg, &cfg.RedisCfg))
+	//	mysqlTransferGroup[i].Start()
+	//}
+	var clickhouseTransferGroup []*data_transfer_service.KafkaToClickhouse
 	for i := 0; i < GlobalCfg.KafkaPartitionNum; i++ {
-		mysqlTransferGroup = append(mysqlTransferGroup, data_transfer_service.NewKafkaToMysql(&cfg.KafkaCfg, &cfg.MySqlCfg, &cfg.RedisCfg))
-		mysqlTransferGroup[i].Start()
+		clickhouseTransferGroup = append(clickhouseTransferGroup, data_transfer_service.NewKafkaToClickhouse(&cfg.KafkaCfg, &cfg.ClickHouseCfg, &cfg.RedisCfg))
+		clickhouseTransferGroup[i].Start()
 	}
 	utils.MsgSuccess("[main_transfer_server]init transfer service successfully!")
 
@@ -38,7 +43,7 @@ func main() {
 
 	// 配置路由
 	routes.SetupDataFlowRoutes(app, &cfg.KafkaCfg, &cfg.RedisCfg)
-	routes.SetupAircraftTaskRoutes(app, &cfg.RedisCfg, &cfg.MySqlCfg)
+	routes.SetupAircraftTaskRoutes(app, &cfg.RedisCfg, &cfg.MySqlCfg, &cfg.ClickHouseCfg)
 	routes.SetupAircraftIdRoutes(app, &cfg.RedisCfg, &cfg.MySqlCfg)
 	utils.MsgSuccess("[main_server]init routes successfully!")
 	// 启动服务器

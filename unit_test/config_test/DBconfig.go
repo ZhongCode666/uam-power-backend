@@ -20,6 +20,16 @@ type Config struct {
 		Port int
 		DB   string
 	}
+	ClickHouseCfg struct {
+		Host        string
+		Port        int
+		DB          string
+		User        string
+		Psw         string
+		BatchSize   int
+		FlushPeriod int
+		Columns     []string
+	}
 }
 
 func NewConfig() *Config {
@@ -40,6 +50,15 @@ func NewConfig() *Config {
 	cfg.MongoCfg.Host = "175.178.125.164"
 	cfg.MongoCfg.Port = 27017
 	cfg.MongoCfg.DB = "test_go"
+
+	cfg.ClickHouseCfg.Host = "175.178.125.164"
+	cfg.ClickHouseCfg.Port = 9000
+	cfg.ClickHouseCfg.DB = "go_test"
+	cfg.ClickHouseCfg.User = "default"
+	cfg.ClickHouseCfg.Psw = "zhonglaoshizhen6"
+	cfg.ClickHouseCfg.BatchSize = 10
+	cfg.ClickHouseCfg.FlushPeriod = 5
+	cfg.ClickHouseCfg.Columns = []string{"Longitude", "Latitude", "Altitude", "Yaw", "DataTime", "Event"}
 
 	return &cfg
 }
