@@ -34,7 +34,7 @@ func NewClickHouse(
 			Password: Password,
 		},
 		Settings: clickhouse.Settings{
-			"max_execution_time": 10, // 最大执行时间（秒）
+			"max_execution_time": 30, // 最大执行时间（秒）
 		},
 		DialTimeout: 10 * time.Second,
 		ReadTimeout: 10 * time.Second,
@@ -42,7 +42,8 @@ func NewClickHouse(
 	}))
 
 	// 配置连接池参数
-	conn.SetConnMaxLifetime(10 * time.Second)
+	conn.SetConnMaxLifetime(30 * time.Second)
+	conn.SetMaxOpenConns(1000)
 
 	// 测试连接
 	if err := conn.Ping(); err != nil {
@@ -114,6 +115,12 @@ func (ch *ClickHouse) flushTable(table string, columns []string) error {
 func (ch *ClickHouse) Insert(table string, columns []string, values [][]interface{}) error {
 	columnsStr := "(" + joinStrings(columns, ",") + ")"
 	query := fmt.Sprintf("INSERT INTO %s %s VALUES %s", table, columnsStr, valuesToString(values))
+	return ch.ExecuteCmd(query)
+}
+
+func (ch *ClickHouse) InsertOne(table string, columns []string, values []interface{}) error {
+	columnsStr := "(" + joinStrings(columns, ",") + ")"
+	query := fmt.Sprintf("INSERT INTO %s %s VALUES %s", table, columnsStr, valuesToStringSingle(values))
 	return ch.ExecuteCmd(query)
 }
 
@@ -190,4 +197,22 @@ func valuesToString(values [][]interface{}) string {
 
 	// 拼接所有行
 	return strings.Join(rows, ",\n")
+}
+
+func valuesToStringSingle(values []interface{}) string {
+	var formattedRow []string
+	for _, value := range values {
+		switch v := value.(type) {
+		case string:
+			// 字符串需要加单引号，并转义
+			formattedRow = append(formattedRow, fmt.Sprintf("'%s'", strings.ReplaceAll(v, "'", "''")))
+		case nil:
+			// 空值处理
+			formattedRow = append(formattedRow, "NULL")
+		default:
+			// 其他类型直接转换为字符串
+			formattedRow = append(formattedRow, fmt.Sprintf("%v", v))
+		}
+	}
+	return fmt.Sprintf("(%s)", strings.Join(formattedRow, ", "))
 }

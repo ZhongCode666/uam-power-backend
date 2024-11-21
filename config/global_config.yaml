@@ -1,4 +1,4 @@
-KafkaPartitionNum: 10
+KafkaPartitionNum: 50
 DBConfigPath: "config/db_config.yaml"
 Port: 26969
 SaveLogToFile: False
