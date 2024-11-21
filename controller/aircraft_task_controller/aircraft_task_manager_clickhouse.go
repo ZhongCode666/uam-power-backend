@@ -68,7 +68,7 @@ func (taskModel *AircraftTaskModelClickHouse) CreateTask(c *fiber.Ctx) error {
 	FlightTable := fmt.Sprintf("%sFlight_AirID%d_Lane%d", curStr, TaskInfo.AircraftID, TaskInfo.LaneID)
 	EventTable := fmt.Sprintf("%sEvent_AirID%d_Lane%d", curStr, TaskInfo.AircraftID, TaskInfo.LaneID)
 	err := taskModel.FlightClickHouseService.ExecuteCmd(
-		fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (Longitude Float64, Latitude Float64, Altitude Float64, Yaw Float64, DataTime DateTime64(6),  UploadTime DateTime64(6) DEFAULT now64(6)) ENGINE = MergeTree() ORDER BY (DataTime DESC);",
+		fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (Longitude Float64 NOT NULL, Latitude Float64 NOT NULL, Altitude Float64 NOT NULL, Yaw Float64 NOT NULL, DataTime DateTime64(6) NOT NULL,  UploadTime DateTime64(6) NOT NULL DEFAULT now64(6)) ENGINE = MergeTree() ORDER BY DataTime;",
 			FlightTable,
 		))
 	if err != nil {
@@ -76,7 +76,7 @@ func (taskModel *AircraftTaskModelClickHouse) CreateTask(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Create Status Table Failed!"})
 	}
 	err = taskModel.EventClickHouseService.ExecuteCmd(
-		fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (DataTime DateTime64(6),  CreateTime DateTime64(6) DEFAULT now64(6), Event String)  ENGINE = MergeTree() ORDER BY (DataTime DESC);",
+		fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (DataTime DateTime64(6) NOT NULL,  CreateTime DateTime64(6) NOT NULL DEFAULT now64(6), Event String NOT NULL)  ENGINE = MergeTree() ORDER BY DataTime;",
 			EventTable,
 		))
 	if err != nil {
