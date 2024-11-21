@@ -21,6 +21,14 @@ func TestClickHoseConnect(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	err = ClickHoseService.ExecuteCmd("CREATE TABLE IF NOT EXISTS test22 (Longitude Float64 NOT NULL, Latitude Float64 NOT NULL, Altitude Float64 NOT NULL, Yaw Float64 NOT NULL, DataTime DateTime64(6) NOT NULL,  UploadTime DateTime64(6) NOT NULL DEFAULT now64(6)) ENGINE = MergeTree() ORDER BY DataTime;")
+	if err != nil {
+		t.Error(err)
+	}
+	err = ClickHoseService.ExecuteCmd("CREATE TABLE IF NOT EXISTS test11 (DataTime DateTime64(6) NOT NULL,  CreateTime DateTime64(6) NOT NULL DEFAULT now64(6), Event String NOT NULL)  ENGINE = MergeTree() ORDER BY DataTime;")
+	if err != nil {
+		t.Error(err)
+	}
 
 }
 

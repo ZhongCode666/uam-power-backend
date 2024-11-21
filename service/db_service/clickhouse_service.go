@@ -34,7 +34,7 @@ func NewClickHouse(
 			Password: Password,
 		},
 		Settings: clickhouse.Settings{
-			"max_execution_time": 20, // 最大执行时间（秒）
+			"max_execution_time": 10, // 最大执行时间（秒）
 		},
 		DialTimeout: 10 * time.Second,
 		ReadTimeout: 10 * time.Second,
@@ -42,9 +42,7 @@ func NewClickHouse(
 	}))
 
 	// 配置连接池参数
-	conn.SetMaxOpenConns(100)
-	conn.SetMaxIdleConns(5)
-	conn.SetConnMaxLifetime(20 * time.Second)
+	conn.SetConnMaxLifetime(10 * time.Second)
 
 	// 测试连接
 	if err := conn.Ping(); err != nil {
