@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
-	"sync"
-	"time"
 	"uam-power-backend/models/config_models/db_config_model"
 	"uam-power-backend/models/controller_models/aircraft_id_model"
 	"uam-power-backend/service/db_service"
@@ -16,7 +14,6 @@ import (
 type AircraftIdController struct {
 	IDMySql   *dbservice.MySQLService
 	RedisInfo *dbservice.RedisDict
-	mu        sync.Mutex
 }
 
 func NewAircraftIdController(
@@ -64,10 +61,7 @@ func (a *AircraftIdController) GetAircraftInfo(c *fiber.Ctx) error {
 }
 
 func (a *AircraftIdController) CreateUser(c *fiber.Ctx) error {
-	a.mu.Lock()         // 加锁，防止并发问题
-	defer a.mu.Unlock() // 在函数结束时解锁
 	curStr := utils.GetTimeStr()
-	time.Sleep(10 * time.Millisecond)
 	var RequestInfo aircraft_id_model.SetAircraftInfo
 	// 绑定 JSON 数据到结构体
 	if err := c.BodyParser(&RequestInfo); err != nil {

@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"time"
 )
 
@@ -8,7 +10,15 @@ func GetTimeStr() string {
 	currentTime := time.Now()
 	// 定义格式化样式
 	formattedTime := currentTime.Format("20060102150405012345")
-	return formattedTime
+	bytes := make([]byte, 32)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		panic(err)
+	}
+
+	// 转换为十六进制字符串
+	uniqueStr := hex.EncodeToString(bytes)
+	return formattedTime + "-" + uniqueStr
 }
 
 func GetTimeFmtStr() string {

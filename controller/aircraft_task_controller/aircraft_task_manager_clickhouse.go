@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
-	"sync"
-	"time"
 	"uam-power-backend/models/config_models/db_config_model"
 	"uam-power-backend/models/controller_models/aircraft_task_model"
 	dbservice "uam-power-backend/service/db_service"
@@ -18,7 +16,6 @@ type AircraftTaskModelClickHouse struct {
 	RedisService            *dbservice.RedisDict
 	FlightClickHouseService *dbservice.ClickHouse
 	EventClickHouseService  *dbservice.ClickHouse
-	mu                      sync.Mutex
 }
 
 func NewAircraftTaskModelClickHouse(
@@ -62,10 +59,7 @@ func NewAircraftTaskModelClickHouse(
 }
 
 func (taskModel *AircraftTaskModelClickHouse) CreateTask(c *fiber.Ctx) error {
-	taskModel.mu.Lock()         // 加锁，防止并发问题
-	defer taskModel.mu.Unlock() // 在函数结束时解锁
 	curStr := utils.GetTimeStr()
-	time.Sleep(10 * time.Millisecond)
 	var TaskInfo aircraft_task_model.CreateTaskAircraftInfo
 	if err := c.BodyParser(&TaskInfo); err != nil {
 		utils.MsgError("        [AircraftTaskModel]CreateTask Invalid Request JSON data")
