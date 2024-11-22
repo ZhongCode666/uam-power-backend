@@ -62,6 +62,7 @@ func (a *AircraftIdController) GetAircraftInfo(c *fiber.Ctx) error {
 
 func (a *AircraftIdController) CreateUser(c *fiber.Ctx) error {
 	curStr := utils.GetTimeStr()
+	randStr := curStr + "-" + utils.GetUniqueStr()
 	var RequestInfo aircraft_id_model.SetAircraftInfo
 	// 绑定 JSON 数据到结构体
 	if err := c.BodyParser(&RequestInfo); err != nil {
@@ -70,7 +71,7 @@ func (a *AircraftIdController) CreateUser(c *fiber.Ctx) error {
 	}
 	_, err := a.IDMySql.ExecuteCmd(
 		fmt.Sprintf("INSERT INTO systemdb.aircraft_identity_table(Type, Company, Name, TimeStr) VALUES ('%s', '%s', '%s', '%s')",
-			RequestInfo.Type, RequestInfo.Company, RequestInfo.Name, curStr,
+			RequestInfo.Type, RequestInfo.Company, RequestInfo.Name, randStr,
 		))
 	if err != nil {
 		utils.MsgError("        [NewAircraftIdController]CreateUser failed to Mysql!, err>" + err.Error())
@@ -78,7 +79,7 @@ func (a *AircraftIdController) CreateUser(c *fiber.Ctx) error {
 	}
 	mysqlRe, mysqlErr := a.IDMySql.QueryRow(
 		fmt.Sprintf("Select * from systemdb.aircraft_identity_table where TimeStr = '%s';",
-			curStr))
+			randStr))
 	if mysqlErr != nil {
 		utils.MsgError("        [NewAircraftIdController]CreateUser data in MySql not found!")
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "N.A.!"})

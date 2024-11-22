@@ -6,10 +6,7 @@ import (
 	"time"
 )
 
-func GetTimeStr() string {
-	currentTime := time.Now()
-	// 定义格式化样式
-	formattedTime := currentTime.Format("20060102150405012345")
+func GetUniqueStr() string {
 	bytes := make([]byte, 32)
 	_, err := rand.Read(bytes)
 	if err != nil {
@@ -18,7 +15,14 @@ func GetTimeStr() string {
 
 	// 转换为十六进制字符串
 	uniqueStr := hex.EncodeToString(bytes)
-	return formattedTime + "-" + uniqueStr
+	return uniqueStr
+}
+
+func GetTimeStr() string {
+	currentTime := time.Now()
+	// 定义格式化样式
+	formattedTime := currentTime.Format("20060102150405012345")
+	return formattedTime
 }
 
 func GetTimeFmtStr() string {

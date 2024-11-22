@@ -60,6 +60,7 @@ func NewAircraftTaskModelClickHouse(
 
 func (taskModel *AircraftTaskModelClickHouse) CreateTask(c *fiber.Ctx) error {
 	curStr := utils.GetTimeStr()
+	randStr := curStr + "-" + utils.GetUniqueStr()
 	var TaskInfo aircraft_task_model.CreateTaskAircraftInfo
 	if err := c.BodyParser(&TaskInfo); err != nil {
 		utils.MsgError("        [AircraftTaskModel]CreateTask Invalid Request JSON data")
@@ -85,7 +86,7 @@ func (taskModel *AircraftTaskModelClickHouse) CreateTask(c *fiber.Ctx) error {
 	}
 	_, err = taskModel.MysqlService.ExecuteCmd(
 		fmt.Sprintf("INSERT INTO systemdb.flight_task_table(AircraftID, LaneID, TrackTable, EventTable, TimeStr) VALUES (%d, %d, '%s', '%s', '%s');",
-			TaskInfo.AircraftID, TaskInfo.LaneID, FlightTable, EventTable, curStr,
+			TaskInfo.AircraftID, TaskInfo.LaneID, FlightTable, EventTable, randStr,
 		))
 	if err != nil {
 		utils.MsgError("        [AircraftTaskModel]CreateTask Create Task Failed!")
@@ -93,7 +94,7 @@ func (taskModel *AircraftTaskModelClickHouse) CreateTask(c *fiber.Ctx) error {
 	}
 	mysqlRe, mysqlErr := taskModel.MysqlService.QueryRow(
 		fmt.Sprintf("Select * from systemdb.flight_task_table where TimeStr = '%s';",
-			curStr))
+			randStr))
 	if mysqlErr != nil {
 		utils.MsgError("        [AircraftTaskModel]CreateTask Query sql failed!")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "N.A.!"})
