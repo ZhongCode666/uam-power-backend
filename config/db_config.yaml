@@ -21,7 +21,7 @@ ClickHouseCfg:
   Host: "127.0.0.1"
   Port: 9000
   Username: default
-  Password: zhonglaoshizhen6
+  Password: Zhonglaoshizhen6!
   FlightDatabase: flightdb
   EventDatabase: eventdb
   BatchSize: 1000
