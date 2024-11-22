@@ -1,4 +1,4 @@
-package data_controller
+package aircraft_data_controller
 
 import (
 	"github.com/gofiber/fiber/v2"
