@@ -5,4 +5,5 @@ type DbConfigModel struct {
 	RedisCfg      RedisConfigModel      `yaml:"RedisCfg"`
 	MySqlCfg      MySqlConfigModel      `yaml:"MySqlCfg"`
 	ClickHouseCfg ClickHouseConfigModel `yaml:"ClickHouseCfg"`
+	MongoCfg      MongoConfigModel      `yaml:"MongoCfg"`
 }

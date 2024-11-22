@@ -1,9 +1,6 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"strconv"
-	"uam-power-backend/routes"
 	"uam-power-backend/service/data_transfer_service"
 	"uam-power-backend/utils"
 )
@@ -37,17 +34,4 @@ func main() {
 		clickhouseTransferGroup[i].Start()
 	}
 	utils.MsgSuccess("[main_transfer_server]init transfer service successfully!")
-
-	// 创建一个新的Gin实例
-	app := fiber.New()
-
-	// 配置路由
-	routes.SetupDataFlowRoutes(app, &cfg.KafkaCfg, &cfg.RedisCfg)
-	routes.SetupAircraftTaskRoutes(app, &cfg.RedisCfg, &cfg.MySqlCfg, &cfg.ClickHouseCfg)
-	routes.SetupAircraftIdRoutes(app, &cfg.RedisCfg, &cfg.MySqlCfg)
-	utils.MsgSuccess("[main_server]init routes successfully!")
-	// 启动服务器
-	if err := app.Listen(":" + strconv.Itoa(GlobalCfg.DataPort)); err != nil {
-		utils.MsgError("[main_server]Failed to run the server: %v")
-	}
 }

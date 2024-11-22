@@ -10,7 +10,7 @@ RedisCfg:
   TaskInfoDBno: 8
   Host: "127.0.0.1"
 MySqlCfg:
-  Usr: "root"
+  Usr: "go"
   Psw: "Zhonglaoshizhen6!"
   Host: "127.0.0.1"
   DB: "systemdb"
@@ -30,3 +30,11 @@ ClickHouseCfg:
   EventFlushPeriod: 30
   FlightColumn: ["Longitude", "Latitude", "Altitude", "Yaw", "DataTime"]
   EventColumn: ["DataTime", "Event"]
+MongoCfg:
+  Host: "127.0.0.1"
+  Port: 27777
+  Usr: "admin"
+  Psw: "21312085PengChengJing!"
+  LaneDataDB: "lanedatadb"
+  AreaDB: "areadb"
+  RasterDB: "rasterdb"
