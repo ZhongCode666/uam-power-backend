@@ -76,6 +76,22 @@ func (mongoDb *MongoDBClient) FindOne(collection string, filter interface{}) (bs
 	return re, nil
 }
 
+func (mongoDb *MongoDBClient) FindOneWithDropRow(collection string, filter interface{}, dropRows interface{}) (bson.M, error) {
+	coll := mongoDb.db.Collection(collection)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	var re bson.M
+	result := coll.FindOne(ctx, filter, options.FindOne().SetProjection(dropRows))
+	err := result.Decode(&re)
+	if err != nil {
+		return nil, err
+	}
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+	return re, nil
+}
+
 // UpdateOne 更新一条数据
 func (mongoDb *MongoDBClient) UpdateOne(collection string, filter interface{}, update interface{}) (*mongo.UpdateResult, error) {
 	coll := mongoDb.db.Collection(collection)

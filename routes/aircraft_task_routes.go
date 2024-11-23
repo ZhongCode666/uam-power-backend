@@ -12,8 +12,8 @@ func SetupAircraftTaskRoutes(
 	MySqlCfg *db_config_model.MySqlConfigModel,
 	ClickHouse *db_config_model.ClickHouseConfigModel,
 ) {
-	//aircraftTaskController := aircraft_task_controller.NewAircraftTaskModel(RedisCfg, MySqlCfg)
-	aircraftTaskController := aircraft_task_controller.NewAircraftTaskModelClickHouse(RedisCfg, MySqlCfg, ClickHouse)
+	aircraftTaskController := aircraft_task_controller.NewAircraftTaskModel(RedisCfg, MySqlCfg)
+	//aircraftTaskController := aircraft_task_controller.NewAircraftTaskModelClickHouse(RedisCfg, MySqlCfg, ClickHouse)
 	uploadApis := r.Group("/aircraftTask")
 	uploadApis.Post("/end", aircraftTaskController.EndTask)
 	uploadApis.Post("/create", aircraftTaskController.CreateTask)

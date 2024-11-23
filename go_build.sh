@@ -6,6 +6,7 @@ gos=(
     "id_route_main.go"
     "task_route_main.go"
     "data_route_main.go"
+    "lane_route_main.go"
     "transfer_main.go"
 )
 

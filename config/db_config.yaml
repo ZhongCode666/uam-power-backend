@@ -20,14 +20,14 @@ MySqlCfg:
 ClickHouseCfg:
   Host: "127.0.0.1"
   Port: 9000
-  Username: default
-  Password: Zhonglaoshizhen6!
-  FlightDatabase: flightdb
-  EventDatabase: eventdb
-  BatchSize: 1000
-  EventBatchSize: 10
-  FlushPeriod: 30
-  EventFlushPeriod: 30
+  Username: "default"
+  Password: "Zhonglaoshizhen6!"
+  FlightDatabase: "flightdb"
+  EventDatabase: "eventdb"
+  BatchSize: 10
+  EventBatchSize: 5
+  FlushPeriod: 1
+  EventFlushPeriod: 1
   FlightColumn: ["Longitude", "Latitude", "Altitude", "Yaw", "DataTime"]
   EventColumn: ["DataTime", "Event"]
 MongoCfg:
@@ -35,6 +35,4 @@ MongoCfg:
   Port: 27777
   Usr: "admin"
   Psw: "21312085PengChengJing!"
-  LaneDataDB: "lanedatadb"
   AreaDB: "areadb"
-  RasterDB: "rasterdb"
