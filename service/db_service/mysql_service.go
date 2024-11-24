@@ -18,6 +18,8 @@ func NewMySQLService(dsn string) (*MySQLService, error) {
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
+	db.SetMaxOpenConns(100) // 最大打开连接数
+	db.SetMaxIdleConns(5)   // 最大空闲连接数
 	db.SetConnMaxLifetime(5 * time.Second)
 	return &MySQLService{db: db}, nil
 }
