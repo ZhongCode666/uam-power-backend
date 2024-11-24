@@ -11,13 +11,13 @@ import (
 )
 
 type UploadAircraftController struct {
-	kafkaStatusService *dbservice.KafkaProducer
-	kafkaEventService  *dbservice.KafkaProducer
+	kafkaStatusService *dbservice.KafkaManager
+	kafkaEventService  *dbservice.KafkaManager
 }
 
 func NewUploadAircraftController(kafkaConfig *db_config_model.KafkaConfigModel) *UploadAircraftController {
-	kafkaStatusService := dbservice.NewKafkaProducer(kafkaConfig.Addr, kafkaConfig.AircraftDataTopic)
-	kafkaEventService := dbservice.NewKafkaProducer(kafkaConfig.Addr, kafkaConfig.AircraftEventTopic)
+	kafkaStatusService := dbservice.NewKafkaManager(kafkaConfig.Addr, kafkaConfig.AircraftDataTopic, kafkaConfig.NumDataProducers)
+	kafkaEventService := dbservice.NewKafkaManager(kafkaConfig.Addr, kafkaConfig.AircraftEventTopic, kafkaConfig.NumEventProducers)
 	utils.MsgSuccess("        [UploadAircraftController]init successfully!")
 	return &UploadAircraftController{
 		kafkaStatusService: kafkaStatusService,
@@ -40,7 +40,7 @@ func (controller *UploadAircraftController) UploadData(c *fiber.Ctx) error {
 		utils.MsgError("        [UploadAircraftController]UploadData error-Invalid JSON data tran_str >" + err.Error())
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
-	err = controller.kafkaStatusService.SendMessage(string(jStr))
+	err = controller.kafkaStatusService.SendMsgRoundRobin(string(jStr))
 	if err != nil {
 		utils.MsgInfo(err.Error())
 		utils.MsgError("        [UploadAircraftController]UploadData error-Invalid JSON data >" + err.Error())
@@ -67,7 +67,7 @@ func (controller *UploadAircraftController) UploadEvent(c *fiber.Ctx) error {
 		utils.MsgError("        [UploadAircraftController]UploadEvent error-Invalid JSON data >" + err.Error())
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
-	err = controller.kafkaEventService.SendMessage(string(jStr))
+	err = controller.kafkaEventService.SendMsgRoundRobin(string(jStr))
 	if err != nil {
 		utils.MsgError("        [UploadAircraftController]UploadEvent error-Invalid JSON data >" + err.Error())
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})

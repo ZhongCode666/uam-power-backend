@@ -108,3 +108,13 @@ func (laneModel *LaneController) GetLane(c *fiber.Ctx) error {
 	utils.MsgSuccess("        [LaneController]GetLane Successfully GetLane!")
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully return Lane!", "data": re})
 }
+
+func (laneModel *LaneController) LaneList(c *fiber.Ctx) error {
+	re, err := laneModel.LaneMysql.QueryRows("Select * from lane_table;")
+	if err != nil {
+		utils.MsgError("        [LaneController]LaneList failed!")
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Get data from mysql error"})
+	}
+	utils.MsgSuccess("        [LaneController]LaneList Successfully GetList!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully return Lane!", "data": re})
+}

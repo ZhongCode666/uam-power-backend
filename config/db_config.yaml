@@ -2,6 +2,8 @@ KafkaCfg:
   Addr: "127.0.0.1:9092"
   AircraftDataTopic: "AircraftData10Area"
   AircraftEventTopic: "AircraftEvent10Area"
+  NumEventProducers: 5
+  NumDataProducers: 10
 RedisCfg:
   Port: 6379
   StatusDBno: 5
