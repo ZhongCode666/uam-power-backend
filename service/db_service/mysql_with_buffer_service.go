@@ -81,24 +81,15 @@ func (b *MySQLWithBufferService) Start() {
 }
 
 func (b *MySQLWithBufferService) InsertMany(table string, rows [][]interface{}) error {
-	placeholder := "(" + strings.Repeat("?,", len(b.columns)-1) + "?)"
-	placeholders := strings.Repeat(placeholder+",", len(rows)-1) + placeholder
-	insertSql := fmt.Sprintf("INSERT INTO %s (%s) VALUES %s",
+	insertSql := fmt.Sprintf("INSERT INTO %s (%s) VALUES %s;",
 		table,
 		strings.Join(b.columns, ", "),
-		strings.Repeat(placeholders+",", len(rows)-1)+placeholders,
+		valuesToString(rows),
 	)
 	// 收集所有的值
-	values := make([]interface{}, 0, len(rows)*len(b.columns))
-	for _, row := range rows {
-		if len(row) != len(b.columns) {
-			return fmt.Errorf("row column count mismatch: expected %d, got %d", len(b.columns), len(row))
-		}
-		values = append(values, row...)
-	}
 
 	// 使用 b.db.Exec 执行批量插入
-	_, err := b.db.Exec(insertSql, values...)
+	_, err := b.db.Exec(insertSql)
 	if err != nil {
 		return fmt.Errorf("failed to insert into table %s: %w", table, err)
 	}
