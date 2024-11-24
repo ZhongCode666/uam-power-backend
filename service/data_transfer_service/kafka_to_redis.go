@@ -61,7 +61,7 @@ func (ser *KafkaToRedis) KafkaStatusToRedis() {
 			utils.MsgError("        [KafkaToRedis]invalid json")
 			continue
 		}
-		err = ser.RedisStatusService.Set(strconv.Itoa(reStruct.AircraftID), KafkaRe)
+		err = ser.RedisStatusService.SetWithDuration(strconv.Itoa(reStruct.AircraftID), KafkaRe, 3600)
 		if err != nil {
 			utils.MsgError("        [KafkaToRedis]invalid json")
 			continue
@@ -88,7 +88,7 @@ func (ser *KafkaToRedis) KafkaEventToRedis() {
 			utils.MsgError("        [KafkaToRedis]KafkaEventToRedis invalid json")
 			continue
 		}
-		err = ser.RedisEventService.Set(strconv.Itoa(reStruct.AircraftID), KafkaRe)
+		err = ser.RedisEventService.SetWithDuration(strconv.Itoa(reStruct.AircraftID), KafkaRe, 3600)
 		if err != nil {
 			utils.MsgError("        [KafkaToRedis]KafkaEventToRedis invalid json")
 			continue

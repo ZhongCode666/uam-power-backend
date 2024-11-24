@@ -102,6 +102,42 @@ func (r *RedisDict) Set(key string, value interface{}) error {
 	return r.client.Set(r.ctx, key, stringValue, 0).Err()
 }
 
+func (r *RedisDict) SetWithDuration(key string, value interface{}, timeout int) error {
+	var stringValue string
+
+	switch v := value.(type) {
+	case bool:
+		if v {
+			stringValue = "true"
+		} else {
+			stringValue = "false"
+		}
+	case nil:
+		stringValue = "null"
+	case int:
+		stringValue = strconv.Itoa(v)
+	case int32:
+		stringValue = strconv.Itoa(int(v))
+	case int64:
+		stringValue = strconv.FormatInt(v, 10)
+	case float32:
+		stringValue = strconv.FormatFloat(float64(v), 'f', -1, 32)
+	case float64:
+		stringValue = strconv.FormatFloat(v, 'f', -1, 64)
+	case string:
+		stringValue = v
+	default:
+		// Marshal to JSON if it's a complex type (e.g., map or list)
+		jsonBytes, err := json.Marshal(value)
+		if err != nil {
+			return err
+		}
+		stringValue = string(jsonBytes)
+	}
+
+	return r.client.Set(r.ctx, key, stringValue, time.Duration(timeout)*time.Second).Err()
+}
+
 // Delete removes a key from Redis
 func (r *RedisDict) Delete(key string) error {
 	return r.client.Del(r.ctx, key).Err()
