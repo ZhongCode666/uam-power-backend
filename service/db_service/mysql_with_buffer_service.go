@@ -25,7 +25,7 @@ func NewMySQLWithBufferService(dsn string, interval int, columns []string) (*MyS
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
-	db.SetConnMaxLifetime(10 * time.Second)
+	db.SetConnMaxLifetime(30 * time.Second)
 	ser := &MySQLWithBufferService{
 		db: db, data: make(map[string][][]interface{}),
 		interval: time.Duration(interval) * time.Second, columns: columns}
