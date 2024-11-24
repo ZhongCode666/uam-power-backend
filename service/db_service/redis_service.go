@@ -17,11 +17,9 @@ type RedisDict struct {
 // NewRedisDict initializes a new RedisDict instance
 func NewRedisDict(host string, port int, db int) *RedisDict {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:         host + ":" + strconv.Itoa(port),
-		DB:           db,
-		IdleTimeout:  30 * time.Minute,
-		PoolSize:     10, // 最大连接数
-		MinIdleConns: 5,  // 最小空闲连接数
+		Addr:        host + ":" + strconv.Itoa(port),
+		DB:          db,
+		IdleTimeout: 5 * time.Second,
 	})
 	return &RedisDict{
 		client: rdb,

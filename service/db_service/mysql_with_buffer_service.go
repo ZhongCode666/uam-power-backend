@@ -26,9 +26,8 @@ func NewMySQLWithBufferService(dsn string, interval int, columns []string) (*MyS
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
-	db.SetConnMaxLifetime(30 * time.Minute)
-	db.SetMaxOpenConns(100) // 最大打开连接数
-	db.SetMaxIdleConns(5)   // 最大空闲连接数
+	db.SetConnMaxLifetime(30 * time.Second)
+	db.SetMaxIdleConns(5) // 最大空闲连接数
 	ser := &MySQLWithBufferService{
 		db: db, data: make(map[string][][]interface{}),
 		interval: time.Duration(interval) * time.Second, columns: columns}
