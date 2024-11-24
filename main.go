@@ -22,7 +22,7 @@ func main() {
 	utils.MsgSuccess("[main_server]load DB config successfully!")
 
 	var redisTransferGroup []*data_transfer_service.KafkaToRedis
-	for i := 0; i < GlobalCfg.KafkaPartitionNum; i++ {
+	for i := 0; i < GlobalCfg.DataKafkaPartitionNum; i++ {
 		redisTransferGroup = append(redisTransferGroup, data_transfer_service.NewKafkaToRedis(&cfg.KafkaCfg, &cfg.RedisCfg))
 		redisTransferGroup[i].Start()
 	}
@@ -32,7 +32,7 @@ func main() {
 	//	mysqlTransferGroup[i].Start()
 	//}
 	var clickhouseTransferGroup []*data_transfer_service.KafkaToClickhouse
-	for i := 0; i < GlobalCfg.KafkaPartitionNum; i++ {
+	for i := 0; i < GlobalCfg.EventKafkaPartitionNum; i++ {
 		clickhouseTransferGroup = append(clickhouseTransferGroup, data_transfer_service.NewKafkaToClickhouse(&cfg.KafkaCfg, &cfg.ClickHouseCfg, &cfg.RedisCfg))
 		clickhouseTransferGroup[i].Start()
 	}

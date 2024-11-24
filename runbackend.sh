@@ -2,6 +2,14 @@
 
 echo "Build and run!"
 
+echo "Creating kafka topic!"
+
+/opt/kafka_2.12-3.8.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create  --if-not-exists --topic AircraftData10Area --partitions 25   --replication-factor 1
+echo "Create data topic successfully!"
+
+/opt/kafka_2.12-3.8.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create  --if-not-exists --topic AircraftEvent10Area --partitions 5   --replication-factor 1
+echo "Create event topic successfully!"
+
 cd ~/uam-power-backend
 
 echo "CD to working dir!"

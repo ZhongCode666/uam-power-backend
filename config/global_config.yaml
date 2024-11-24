@@ -1,4 +1,5 @@
-KafkaPartitionNum: 10
+EventKafkaPartitionNum: 5
+DataKafkaPartitionNum: 25
 DBConfigPath: "config/db_config.yaml"
 DataPort: 26969
 IDPort: 27070

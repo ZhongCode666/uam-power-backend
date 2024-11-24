@@ -3,7 +3,7 @@ KafkaCfg:
   AircraftDataTopic: "AircraftData10Area"
   AircraftEventTopic: "AircraftEvent10Area"
   NumEventProducers: 5
-  NumDataProducers: 10
+  NumDataProducers: 25
 RedisCfg:
   Port: 6379
   StatusDBno: 5
