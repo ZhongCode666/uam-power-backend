@@ -1,6 +1,7 @@
 package main
 
 import (
+	"time"
 	"uam-power-backend/service/data_transfer_service"
 	"uam-power-backend/utils"
 )
@@ -34,4 +35,9 @@ func main() {
 	//	clickhouseTransferGroup[i].Start()
 	//}
 	utils.MsgSuccess("[main_transfer_server]init transfer service successfully!")
+	for true {
+		time.Sleep(10 * time.Second)
+		utils.MsgSuccess("[main_transfer_server]heart beating...")
+	}
+	utils.MsgError("[main_transfer_server]Quit!")
 }
