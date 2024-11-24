@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"uam-power-backend/utils"
 )
 
 type MySQLWithBufferService struct {
@@ -30,6 +31,7 @@ func NewMySQLWithBufferService(dsn string, interval int, columns []string) (*MyS
 		db: db, data: make(map[string][][]interface{}),
 		interval: time.Duration(interval) * time.Second, columns: columns}
 	ser.Start()
+	utils.MsgSuccess("          [MySQLWithBufferService]init successfully!")
 	return ser, nil
 }
 
@@ -44,20 +46,24 @@ func (b *MySQLWithBufferService) Add(table string, row []interface{}) {
 
 	// 将数据追加到缓冲区
 	b.data[table] = append(b.data[table], row)
+	utils.MsgSuccess("          [MySQLWithBufferService]Add successfully!")
 }
 
 // flushTable 批量插入指定表的数据
 func (b *MySQLWithBufferService) flushTable(table string) {
 	rows, exists := b.data[table]
 	if !exists {
+		utils.MsgError("          [MySQLWithBufferService]flushTable not exists " + table)
 		return
 	}
 	err := b.InsertMany(table, rows)
 	if err != nil {
+		utils.MsgError("          [MySQLWithBufferService]flushTable insert to mysql error " + err.Error())
 		return
 	}
 
 	delete(b.data, table)
+	utils.MsgError("          [MySQLWithBufferService]flushTable successfully!")
 }
 
 func (b *MySQLWithBufferService) Start() {
@@ -69,6 +75,7 @@ func (b *MySQLWithBufferService) Start() {
 				b.flushTable(table)
 			}
 			b.mu.Unlock()
+			utils.MsgError("          [MySQLWithBufferService]to mysql successfully!")
 		}
 	}()
 }
