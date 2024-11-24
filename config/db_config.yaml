@@ -17,6 +17,10 @@ MySqlCfg:
   FlightDB: "flightdb"
   EventDB: "eventdb"
   Port: 3306
+  FlightColumn: [ "Longitude", "Latitude", "Altitude", "Yaw", "DataTime" ]
+  EventColumn: [ "DataTime", "Event" ]
+  FlightInterval: 60
+  EventInterval: 60
 ClickHouseCfg:
   Host: "127.0.0.1"
   Port: 9000

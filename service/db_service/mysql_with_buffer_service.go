@@ -1,0 +1,99 @@
+package dbservice
+
+import (
+	"database/sql"
+	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"strings"
+	"sync"
+	"time"
+)
+
+type MySQLWithBufferService struct {
+	db       *sql.DB
+	data     map[string][][]interface{}
+	mu       sync.Mutex
+	columns  []string
+	interval time.Duration
+}
+
+func NewMySQLWithBufferService(dsn string, interval int, columns []string) (*MySQLWithBufferService, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+	db.SetConnMaxLifetime(10 * time.Second)
+	ser := &MySQLWithBufferService{
+		db: db, data: make(map[string][][]interface{}),
+		interval: time.Duration(interval) * time.Second, columns: columns}
+	ser.Start()
+	return ser, nil
+}
+
+func (b *MySQLWithBufferService) Add(table string, row []interface{}) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	// 初始化表的缓冲区（如果尚未存在）
+	if _, exists := b.data[table]; !exists {
+		b.data[table] = [][]interface{}{}
+	}
+
+	// 将数据追加到缓冲区
+	b.data[table] = append(b.data[table], row)
+}
+
+// flushTable 批量插入指定表的数据
+func (b *MySQLWithBufferService) flushTable(table string) {
+	rows, exists := b.data[table]
+	if !exists {
+		return
+	}
+	err := b.InsertMany(table, rows)
+	if err != nil {
+		return
+	}
+
+	delete(b.data, table)
+}
+
+func (b *MySQLWithBufferService) Start() {
+	go func() {
+		for {
+			time.Sleep(b.interval)
+			b.mu.Lock()
+			for table := range b.data {
+				b.flushTable(table)
+			}
+			b.mu.Unlock()
+		}
+	}()
+}
+
+func (b *MySQLWithBufferService) InsertMany(table string, rows [][]interface{}) error {
+	placeholder := "(" + strings.Repeat("?,", len(b.columns)-1) + "?)"
+	placeholders := strings.Repeat(placeholder+",", len(rows)-1) + placeholder
+	insertSql := fmt.Sprintf("INSERT INTO %s (%s) VALUES %s",
+		table,
+		strings.Join(b.columns, ", "),
+		strings.Repeat(placeholders+",", len(rows)-1)+placeholders,
+	)
+	// 收集所有的值
+	values := make([]interface{}, 0, len(rows)*len(b.columns))
+	for _, row := range rows {
+		if len(row) != len(b.columns) {
+			return fmt.Errorf("row column count mismatch: expected %d, got %d", len(b.columns), len(row))
+		}
+		values = append(values, row...)
+	}
+
+	// 使用 b.db.Exec 执行批量插入
+	_, err := b.db.Exec(insertSql, values...)
+	if err != nil {
+		return fmt.Errorf("failed to insert into table %s: %w", table, err)
+	}
+	return nil
+}

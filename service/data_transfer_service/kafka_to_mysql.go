@@ -17,8 +17,8 @@ import (
 type KafkaToMysql struct {
 	KafkaEventConsumerService  *dbservice.KafkaConsumer
 	KafkaStatusConsumerService *dbservice.KafkaConsumer
-	MysqlStatusService         *dbservice.MySQLService
-	MysqlEventService          *dbservice.MySQLService
+	MysqlStatusService         *dbservice.MySQLWithBufferService
+	MysqlEventService          *dbservice.MySQLWithBufferService
 	RedisService               *dbservice.RedisDict
 	StopFlag                   bool
 	StatusDone                 chan bool
@@ -38,7 +38,7 @@ func NewKafkaToMysql(
 		MySqlConfig.Usr, MySqlConfig.Psw, MySqlConfig.Host, MySqlConfig.Port,
 		MySqlConfig.FlightDB,
 	)
-	FlightMysqlService, FlightErr := dbservice.NewMySQLService(mysqlLink)
+	FlightMysqlService, FlightErr := dbservice.NewMySQLWithBufferService(mysqlLink, MySqlConfig.FlightInterval, MySqlConfig.FlightColumn)
 	if FlightErr != nil {
 		return nil
 	}
@@ -47,7 +47,7 @@ func NewKafkaToMysql(
 		MySqlConfig.Usr, MySqlConfig.Psw, MySqlConfig.Host, MySqlConfig.Port,
 		MySqlConfig.EventDB,
 	)
-	EventMysqlService, EventErr := dbservice.NewMySQLService(mysqlLink)
+	EventMysqlService, EventErr := dbservice.NewMySQLWithBufferService(mysqlLink, MySqlConfig.EventInterval, MySqlConfig.EventColumn)
 	if EventErr != nil {
 		return nil
 	}
@@ -98,16 +98,18 @@ func (ser *KafkaToMysql) KafkaStatusToMysql() {
 			utils.MsgError("        [KafkaToMysql]Invalid Json!")
 			continue
 		}
-		sql := fmt.Sprintf("INSERT INTO flightdb.%s (Longitude, Latitude, Altitude, Yaw, DataTime) VALUES (%f, %f, %f, %f, '%s');",
-			mysqlData.TrackTable, reStruct.Longitude, reStruct.Latitude, reStruct.Altitude, reStruct.Yaw,
-			reStruct.TimeString,
-		)
-		//utils.MsgInfo("SQL>" + sql)
-		_, err = ser.MysqlStatusService.ExecuteCmd(sql)
-		if err != nil {
-			utils.MsgError("        [KafkaToMysql]Can not insert! err>" + err.Error())
-			continue
-		}
+		//sql := fmt.Sprintf("INSERT INTO flightdb.%s (Longitude, Latitude, Altitude, Yaw, DataTime) VALUES (%f, %f, %f, %f, '%s');",
+		//	mysqlData.TrackTable, reStruct.Longitude, reStruct.Latitude, reStruct.Altitude, reStruct.Yaw,
+		//	reStruct.TimeString,
+		//)
+		////utils.MsgInfo("SQL>" + sql)
+		//_, err = ser.MysqlStatusService.ExecuteCmd(sql)
+		//if err != nil {
+		//	utils.MsgError("        [KafkaToMysql]Can not insert! err>" + err.Error())
+		//	continue
+		//}
+		arr := []interface{}{reStruct.Longitude, reStruct.Latitude, reStruct.Altitude, reStruct.Yaw, reStruct.TimeString}
+		ser.MysqlStatusService.Add(mysqlData.TrackTable, arr)
 		utils.MsgSuccess("        [KafkaToMysql]successfully insert status!")
 	}
 	ser.StatusDone <- true
@@ -137,14 +139,16 @@ func (ser *KafkaToMysql) KafkaEventToMysql() {
 		jsonData, _ := json.Marshal(re)
 		var mysqlData aircraft_task_model.MysqlAircraftTask
 		err = json.Unmarshal(jsonData, &mysqlData)
-		_, err = ser.MysqlEventService.ExecuteCmd(
-			fmt.Sprintf("INSERT INTO %s(DataTime, Event) VALUES ('%s', '%s')",
-				mysqlData.EventTable, reStruct.TimeString, reStruct.Event,
-			))
-		if err != nil {
-			utils.MsgError("        [KafkaToMysql]KafkaEventToMysql failed to insert!")
-			continue
-		}
+		//_, err = ser.MysqlEventService.ExecuteCmd(
+		//	fmt.Sprintf("INSERT INTO %s(DataTime, Event) VALUES ('%s', '%s')",
+		//		mysqlData.EventTable, reStruct.TimeString, reStruct.Event,
+		//	))
+		//if err != nil {
+		//	utils.MsgError("        [KafkaToMysql]KafkaEventToMysql failed to insert!")
+		//	continue
+		//}
+		arr := []interface{}{reStruct.TimeString, reStruct.Event}
+		ser.MysqlEventService.Add(mysqlData.EventTable, arr)
 		utils.MsgSuccess("        [KafkaToMysql]KafkaEventToMysql successfully insert!")
 	}
 	ser.EventDone <- true
