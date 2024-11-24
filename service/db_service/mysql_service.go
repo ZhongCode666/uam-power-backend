@@ -20,7 +20,7 @@ func NewMySQLService(dsn string) (*MySQLService, error) {
 	}
 	db.SetMaxOpenConns(100) // 最大打开连接数
 	db.SetMaxIdleConns(5)   // 最大空闲连接数
-	db.SetConnMaxLifetime(5 * time.Second)
+	db.SetConnMaxLifetime(30 * time.Minute)
 	return &MySQLService{db: db}, nil
 }
 

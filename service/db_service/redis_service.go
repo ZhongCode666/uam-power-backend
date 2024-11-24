@@ -19,9 +19,9 @@ func NewRedisDict(host string, port int, db int) *RedisDict {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:         host + ":" + strconv.Itoa(port),
 		DB:           db,
-		IdleTimeout:  5 * time.Second,
-		PoolSize:     100, // 最大连接数
-		MinIdleConns: 5,   // 最小空闲连接数
+		IdleTimeout:  30 * time.Minute,
+		PoolSize:     10, // 最大连接数
+		MinIdleConns: 5,  // 最小空闲连接数
 	})
 	return &RedisDict{
 		client: rdb,
