@@ -5,4 +5,5 @@ DataPort: 26969
 IDPort: 27070
 TaskPort: 27171
 LanePort: 27272
+AreaPort: 27373
 SaveLogToFile: False

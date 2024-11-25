@@ -20,6 +20,7 @@ gos=(
     "task_route_main"
     "data_route_main"
     "lane_route_main"
+    "area_route_main"
     "transfer_main"
 )
 

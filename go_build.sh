@@ -7,6 +7,7 @@ gos=(
     "task_route_main.go"
     "data_route_main.go"
     "lane_route_main.go"
+    "area_route_main.go"
     "transfer_main.go"
 )
 

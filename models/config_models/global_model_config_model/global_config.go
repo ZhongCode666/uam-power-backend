@@ -6,6 +6,7 @@ type GlobalConfig struct {
 	IDPort                 int    `yaml:"IDPort"`
 	DataPort               int    `yaml:"DataPort"`
 	LanePort               int    `yaml:"LanePort"`
+	AreaPort               int    `yaml:"AreaPort"`
 	SaveLogToFile          bool   `yaml:"SaveLogToFile"`
 	EventKafkaPartitionNum int    `yaml:"EventKafkaPartitionNum"`
 	DataKafkaPartitionNum  int    `yaml:"DataKafkaPartitionNum"`
