@@ -14,7 +14,7 @@ RedisCfg:
 MySqlCfg:
   Usr: "go"
   Psw: "Zhonglaoshizhen6!"
-  Host: "175.178.125.164"
+  Host: "127.0.0.1"
   DB: "systemdb"
   FlightDB: "flightdb"
   EventDB: "eventdb"
@@ -37,7 +37,7 @@ ClickHouseCfg:
   FlightColumn: ["Longitude", "Latitude", "Altitude", "Yaw", "DataTime"]
   EventColumn: ["DataTime", "Event"]
 MongoCfg:
-  Host: "175.178.125.164"
+  Host: "127.0.0.1"
   Port: 27777
   Usr: "admin"
   Psw: "21312085PengChengJing!"
