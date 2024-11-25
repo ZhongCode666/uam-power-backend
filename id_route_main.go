@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"strconv"
 	"uam-power-backend/routes"
 	"uam-power-backend/utils"
@@ -20,7 +21,7 @@ func main() {
 	}
 	utils.MsgSuccess("[main_server]load DB config successfully!")
 	app := fiber.New()
-
+	app.Use(cors.New())
 	// 配置路由
 	routes.SetupAircraftIdRoutes(app, &cfg.RedisCfg, &cfg.MySqlCfg)
 	utils.MsgSuccess("[main_server]init routes successfully!")
