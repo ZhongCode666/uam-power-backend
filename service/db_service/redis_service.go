@@ -160,6 +160,9 @@ func (r *RedisDict) GetVals(keys []string) ([]interface{}, error) {
 		return nil, err
 	}
 	for i, v := range ReInterface {
+		if v == nil {
+			continue
+		}
 		ReInterface[i], _ = ConvertStringToInterface(v.(string))
 	}
 	return ReInterface, nil
