@@ -155,7 +155,14 @@ func (r *RedisDict) Keys() ([]string, error) {
 }
 
 func (r *RedisDict) GetVals(keys []string) ([]interface{}, error) {
-	return r.client.MGet(r.ctx, keys...).Result()
+	ReInterface, err := r.client.MGet(r.ctx, keys...).Result()
+	if err != nil {
+		return nil, err
+	}
+	for i, v := range ReInterface {
+		ReInterface[i], _ = ConvertStringToInterface(v.(string))
+	}
+	return ReInterface, nil
 }
 
 // Pop retrieves a value by key and deletes the key from Redis
