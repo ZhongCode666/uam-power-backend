@@ -1,7 +1,8 @@
 EventKafkaPartitionNum: 5
 DataKafkaPartitionNum: 25
 DBConfigPath: "config/db_config.yaml"
-DataPort: 26969
+DataUploadPort: 26969
+DataReceivePort: 26868
 IDPort: 27070
 TaskPort: 27171
 LanePort: 27272

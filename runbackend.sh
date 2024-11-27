@@ -15,21 +15,33 @@ cd ~/uam-power-backend
 
 echo "CD to working dir!"
 
-gos=(
+apis_gos=(
     "id_route_main"
     "task_route_main"
-    "data_route_main"
+    "upload_route_main"
     "lane_route_main"
     "area_route_main"
-    "transfer_main"
+    "receive_route_main"
 )
 
-for cmd in "${gos[@]}"; do
-    echo "Building: $cmd.go"
-    eval "go build $cmd.go"
+transfer_gos=(
+  "transfer_to_mysql"
+  "transfer_to_redis"
+)
+
+echo "Starting to build apis..."
+
+for cmd in "${apis_gos[@]}"; do
+    echo "Building: main_services/apis/$cmd.go"
+    eval "go build main_services/apis/$cmd.go"
 done
 
-echo "All go are built!"
+echo "Starting to build transfer..."
+
+for cmd in "${transfer_gos[@]}"; do
+    echo "Building: main_services/transfer/$cmd.go"
+    eval "go build main_services/transfer/$cmd.go"
+done
 
 
 # 获取当前日期和时间（格式：YYYY-MM-DD_HH-MM-SS）
@@ -41,7 +53,14 @@ mkdir -p "$log_dir"
 
 
 # 循环执行每个 nohup 命令
-for cmd in "${gos[@]}"; do
+echo "Starting to execute apis..."
+for cmd in "${apis_gos[@]}"; do
+    echo "Executing: $cmd"
+    eval "nohup $HOME/uam-power-backend/$cmd > $log_dir/$cmd.log 2>&1 &"
+done
+
+echo "Starting to execute transfer..."
+for cmd in "${transfer_gos[@]}"; do
     echo "Executing: $cmd"
     eval "nohup $HOME/uam-power-backend/$cmd > $log_dir/$cmd.log 2>&1 &"
 done

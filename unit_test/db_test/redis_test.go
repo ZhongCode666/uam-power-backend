@@ -142,3 +142,13 @@ func TestRedisKeys(t *testing.T) {
 	}
 	t.Log(re)
 }
+
+func TestRedisGetVals(t *testing.T) {
+	cfg := DBconfig.NewConfig()
+	redisFun := dbservice.NewRedisDict(cfg.RedisCfg.Host, cfg.RedisCfg.Port, cfg.RedisCfg.DBno)
+	re, err := redisFun.GetVals([]string{"a", "b", "c"})
+	if err != nil {
+		t.Errorf("test_getmany%s", err)
+	}
+	t.Log(re)
+}

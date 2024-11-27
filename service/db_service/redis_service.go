@@ -36,6 +36,10 @@ func (r *RedisDict) Get(key string) (interface{}, error) {
 		return nil, err
 	}
 
+	return ConvertStringToInterface(value)
+}
+
+func ConvertStringToInterface(value string) (interface{}, error) {
 	// Attempt to convert the value to the appropriate type
 	if value == "true" {
 		return true, nil
@@ -58,8 +62,6 @@ func (r *RedisDict) Get(key string) (interface{}, error) {
 	if err := json.Unmarshal([]byte(value), &jsonData); err == nil {
 		return jsonData, nil
 	}
-
-	// If all conversions fail, return the original string
 	return value, nil
 }
 
@@ -150,6 +152,10 @@ func (r *RedisDict) Exists(key string) (bool, error) {
 // Keys retrieves all keys in Redis
 func (r *RedisDict) Keys() ([]string, error) {
 	return r.client.Keys(r.ctx, "*").Result()
+}
+
+func (r *RedisDict) GetVals(keys []string) ([]interface{}, error) {
+	return r.client.MGet(r.ctx, keys...).Result()
 }
 
 // Pop retrieves a value by key and deletes the key from Redis

@@ -18,12 +18,6 @@ func main() {
 		return
 	}
 	utils.MsgSuccess("[main_server]load DB config successfully!")
-
-	var redisTransferGroup []*data_transfer_service.KafkaToRedis
-	for i := 0; i < GlobalCfg.DataKafkaPartitionNum; i++ {
-		redisTransferGroup = append(redisTransferGroup, data_transfer_service.NewKafkaToRedis(&cfg.KafkaCfg, &cfg.RedisCfg))
-		redisTransferGroup[i].Start()
-	}
 	var mysqlTransferGroup []*data_transfer_service.KafkaToMysql
 	for i := 0; i < GlobalCfg.EventKafkaPartitionNum; i++ {
 		mysqlTransferGroup = append(mysqlTransferGroup, data_transfer_service.NewKafkaToMysql(&cfg.KafkaCfg, &cfg.MySqlCfg, &cfg.RedisCfg))

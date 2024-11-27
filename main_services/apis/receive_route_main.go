@@ -25,8 +25,8 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New())
 	// 配置路由
-	routes.SetupDataFlowRoutes(app, &cfg.KafkaCfg, &cfg.RedisCfg)
-	if err := app.Listen(":" + strconv.Itoa(GlobalCfg.DataPort)); err != nil {
+	routes.SetupReceiveFlowRoutes(app, &cfg.RedisCfg, &cfg.MySqlCfg)
+	if err := app.Listen(":" + strconv.Itoa(GlobalCfg.DataReceivePort)); err != nil {
 		utils.MsgError("[main_server]Failed to run the server: %v")
 	}
 }

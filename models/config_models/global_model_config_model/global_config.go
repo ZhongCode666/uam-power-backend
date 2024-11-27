@@ -4,7 +4,8 @@ type GlobalConfig struct {
 	DBConfigPath           string `yaml:"DBConfigPath"`
 	TaskPort               int    `yaml:"TaskPort"`
 	IDPort                 int    `yaml:"IDPort"`
-	DataPort               int    `yaml:"DataPort"`
+	DataUploadPort         int    `yaml:"DataUploadPort"`
+	DataReceivePort        int    `yaml:"DataReceivePort"`
 	LanePort               int    `yaml:"LanePort"`
 	AreaPort               int    `yaml:"AreaPort"`
 	SaveLogToFile          bool   `yaml:"SaveLogToFile"`
