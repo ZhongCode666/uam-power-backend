@@ -193,7 +193,7 @@ func (receiver *RequestAircraft) ReceiveHistoryEvent(c *fiber.Ctx) error {
 		utils.MsgError("        [ReceiveAircraft]ReceiveHistoryEvent Unmarshal fail!")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Unmarshal fail!"})
 	}
-	rows, MysqlErr := receiver.FlightMysql.QueryRows(fmt.Sprintf("SELECT * FROM %s;", mysqlData.EventTable))
+	rows, MysqlErr := receiver.EventMysql.QueryRows(fmt.Sprintf("SELECT * FROM %s;", mysqlData.EventTable))
 	if MysqlErr != nil {
 		utils.MsgError("        [ReceiveAircraft]ReceiveHistoryEvent find Event from mysql failed!")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Find Event from mysql failed"})
