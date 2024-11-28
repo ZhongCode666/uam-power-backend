@@ -19,7 +19,10 @@ func main() {
 		return
 	}
 	utils.MsgSuccess("[main_server]load DB config successfully!")
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		// 设置请求体的最大大小（单位：字节）
+		BodyLimit: 50 * 1024 * 1024, // 50 MB
+	})
 	app.Use(cors.New())
 	// 配置路由
 	routes.SetupLaneRoutes(app, &cfg.MongoCfg, &cfg.MySqlCfg)
