@@ -137,7 +137,7 @@ func (ac *AreaController) GetAreaData(c *fiber.Ctx) error {
 		utils.MsgError("        [AreaController]GetAreaData Query sql failed!")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "N.A.!"})
 	}
-	returnData := bson.M{"AreaID": AreaInfo.AreaID, "RasterIndex": re["RasterIndex"], "RasterData": mysqlRe}
+	returnData := bson.M{"AreaID": AreaInfo.AreaID, "AreaData": re, "RasterData": mysqlRe}
 	utils.MsgSuccess("        [AreaController]GetAreaData Successfully GetAreaData!")
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully GetAreaData!", "data": returnData})
 }
