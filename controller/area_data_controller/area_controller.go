@@ -96,7 +96,7 @@ func (ac *AreaController) CreateArea(c *fiber.Ctx) error {
 		values = append(
 			values,
 			fmt.Sprintf(
-				"(%d, %d, %.f, %.6f, %.f, '%s')",
+				"(%d, %d, %.12f, %.12f, %.12f, '%s')",
 				id, mysqlData.AreaID, longitude, latitude, altitude, status,
 			))
 	}
@@ -121,7 +121,8 @@ func (ac *AreaController) GetAreaData(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
 	filter := bson.M{"AreaID": AreaInfo.AreaID}
-	re, err := ac.AreaMongoDB.FindOne("area_collection", filter)
+	drops := bson.M{"_id": 0}
+	re, err := ac.AreaMongoDB.FindOneWithDropRow("area_collection", filter, drops)
 	if err != nil {
 		utils.MsgError("        [AreaController]GetAreaData FindOne error!")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Mongo find one failed"})

@@ -142,6 +142,29 @@ func (mongoDb *MongoDBClient) FindAll(collection string, filter interface{}) ([]
 	return results, nil
 }
 
+func (mongoDb *MongoDBClient) FindAllWithDrops(collection string, filter interface{}, drops interface{}) ([]bson.M, error) {
+	coll := mongoDb.db.Collection(collection)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	cursor, err := coll.Find(ctx, filter, options.Find().SetProjection(drops))
+	if err != nil {
+		return nil, err
+	}
+	defer func(cursor *mongo.Cursor, ctx context.Context) {
+		err := cursor.Close(ctx)
+		if err != nil {
+
+		}
+	}(cursor, ctx)
+
+	var results []bson.M
+	if err := cursor.All(ctx, &results); err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
 // CreateCollection 创建新集合
 func (mongoDb *MongoDBClient) CreateCollection(collectionName string) error {
 	// 检查集合是否已存在

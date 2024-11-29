@@ -109,6 +109,27 @@ func (laneModel *LaneController) GetLane(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully return Lane!", "data": re})
 }
 
+func (laneModel *LaneController) GetAllLane(c *fiber.Ctx) error {
+	var LaneInfo lane_model.FindLaneModel
+	if err := c.BodyParser(&LaneInfo); err != nil {
+		utils.MsgError("        [LaneController]GetAllLane Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	filter := bson.M{"IsHide": false}
+	drops := bson.M{"_id": 0}
+	re, err := laneModel.LaneMongoDB.FindAllWithDrops("lane_data_collection", filter, drops)
+	if err != nil {
+		utils.MsgError("        [LaneController]GetAllLane Find Lane error!")
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "N.A."})
+	}
+	if re == nil {
+		utils.MsgError("        [LaneController]GetAllLane no such lane!")
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "N.A."})
+	}
+	utils.MsgSuccess("        [LaneController]GetAllLane Successfully GetLane!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully return Lane!", "data": re})
+}
+
 func (laneModel *LaneController) LaneList(c *fiber.Ctx) error {
 	re, err := laneModel.LaneMysql.QueryRows("Select * from lane_table;")
 	if err != nil {
