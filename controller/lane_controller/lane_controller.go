@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"strings"
 	"uam-power-backend/models/config_models/db_config_model"
 	"uam-power-backend/models/controller_models/lane_model"
 	"uam-power-backend/service/db_service"
@@ -138,4 +139,78 @@ func (laneModel *LaneController) LaneList(c *fiber.Ctx) error {
 	}
 	utils.MsgSuccess("        [LaneController]LaneList Successfully GetList!")
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully return Lane!", "data": re})
+}
+
+func (laneModel *LaneController) HideLane(c *fiber.Ctx) error {
+	var showHideLaneModel lane_model.ShowHideLaneModel
+	if err := c.BodyParser(&showHideLaneModel); err != nil {
+		utils.MsgError("        [LaneController]HideLane Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	_, err := laneModel.LaneMysql.ExecuteCmd(
+		fmt.Sprintf("UPDATE lane_table SET IsHide = 1 WHERE LaneID IN %s;",
+			"("+strings.Trim(strings.Join(strings.Fields(fmt.Sprint(showHideLaneModel.LaneIDs)), ", "), "[]")+")",
+		))
+	if err != nil {
+		utils.MsgError("        [LaneController]HideLane Change mysql lane status failed!")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Change mysql failed!"})
+	}
+	filter := bson.M{"LaneID": bson.M{"$in": showHideLaneModel.LaneIDs}}
+	update := bson.M{"$set": bson.M{"IsHide": true}}
+	_, MErr := laneModel.LaneMongoDB.Update("lane_data_collection", filter, update)
+	if MErr != nil {
+		utils.MsgError("        [LaneController]HideLane Change mongo lane status failed!")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Change mongo failed!"})
+	}
+	utils.MsgSuccess("        [LaneController]HideLane Successfully HideLane!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully hide Lanes!"})
+}
+
+func (laneModel *LaneController) ShowLane(c *fiber.Ctx) error {
+	var showHideLaneModel lane_model.ShowHideLaneModel
+	if err := c.BodyParser(&showHideLaneModel); err != nil {
+		utils.MsgError("        [LaneController]ShowLane Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	_, err := laneModel.LaneMysql.ExecuteCmd(
+		fmt.Sprintf("UPDATE lane_table SET IsHide = 0 WHERE LaneID IN %s;",
+			"("+strings.Trim(strings.Join(strings.Fields(fmt.Sprint(showHideLaneModel.LaneIDs)), ", "), "[]")+")",
+		))
+	if err != nil {
+		utils.MsgError("        [LaneController]ShowLane Change mysql lane status failed!")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Change mysql failed!"})
+	}
+	filter := bson.M{"LaneID": bson.M{"$in": showHideLaneModel.LaneIDs}}
+	update := bson.M{"$set": bson.M{"IsHide": false}}
+	_, MErr := laneModel.LaneMongoDB.Update("lane_data_collection", filter, update)
+	if MErr != nil {
+		utils.MsgError("        [LaneController]ShowLane Change mongo lane status failed!")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Change mongo failed!"})
+	}
+	utils.MsgSuccess("        [LaneController]ShowLane Successfully ShowLane!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully show Lanes!"})
+}
+
+func (laneModel *LaneController) DeleteLane(c *fiber.Ctx) error {
+	var showHideLaneModel lane_model.ShowHideLaneModel
+	if err := c.BodyParser(&showHideLaneModel); err != nil {
+		utils.MsgError("        [LaneController]DeleteLane Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	_, err := laneModel.LaneMysql.ExecuteCmd(
+		fmt.Sprintf("DELETE FROM lane_table WHERE LaneID IN %s;",
+			"("+strings.Trim(strings.Join(strings.Fields(fmt.Sprint(showHideLaneModel.LaneIDs)), ", "), "[]")+")",
+		))
+	if err != nil {
+		utils.MsgError("        [LaneController]DeleteLane Change mysql lane status failed!")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Change mysql failed!"})
+	}
+	filter := bson.M{"LaneID": bson.M{"$in": showHideLaneModel.LaneIDs}}
+	_, MErr := laneModel.LaneMongoDB.Delete("lane_data_collection", filter)
+	if MErr != nil {
+		utils.MsgError("        [LaneController]DeleteLane Change mongo lane status failed!")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Change mongo failed!"})
+	}
+	utils.MsgSuccess("        [LaneController]DeleteLane Successfully DeleteLane!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully delete Lanes!"})
 }

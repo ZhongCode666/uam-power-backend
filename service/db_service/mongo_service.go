@@ -105,6 +105,18 @@ func (mongoDb *MongoDBClient) UpdateOne(collection string, filter interface{}, u
 	return result, nil
 }
 
+func (mongoDb *MongoDBClient) Update(collection string, filter interface{}, update interface{}) (*mongo.UpdateResult, error) {
+	coll := mongoDb.db.Collection(collection)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result, err := coll.UpdateMany(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 // DeleteOne 删除一条数据
 func (mongoDb *MongoDBClient) DeleteOne(collection string, filter interface{}) (*mongo.DeleteResult, error) {
 	coll := mongoDb.db.Collection(collection)
@@ -112,6 +124,18 @@ func (mongoDb *MongoDBClient) DeleteOne(collection string, filter interface{}) (
 	defer cancel()
 
 	result, err := coll.DeleteOne(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (mongoDb *MongoDBClient) Delete(collection string, filter interface{}) (*mongo.DeleteResult, error) {
+	coll := mongoDb.db.Collection(collection)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result, err := coll.DeleteMany(ctx, filter)
 	if err != nil {
 		return nil, err
 	}

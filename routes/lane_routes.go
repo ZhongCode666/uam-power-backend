@@ -19,5 +19,8 @@ func SetupLaneRoutes(
 	recApis.Post("/getInfo", laneController.GetLane)
 	recApis.Get("/getAllNotHidden", laneController.GetAllLane)
 	recApis.Get("/list", laneController.LaneList)
+	recApis.Post("/hide", laneController.HideLane)
+	recApis.Post("/show", laneController.ShowLane)
+	recApis.Post("/delete", laneController.DeleteLane)
 	utils.MsgSuccess("    [SetupDataLaneRoutes]Successfully init!")
 }

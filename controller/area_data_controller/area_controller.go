@@ -163,3 +163,28 @@ func (ac *AreaController) UpdateRasterData(c *fiber.Ctx) error {
 	utils.MsgSuccess("        [AreaController]UpdateRasterData Successfully UpdateRasterData!")
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully UpdateRasterData!"})
 }
+
+func (ac *AreaController) DeleteAreaData(c *fiber.Ctx) error {
+	var AreaInfo area_model.GetAreaData
+	if err := c.BodyParser(&AreaInfo); err != nil {
+		utils.MsgError("        [AreaController]DeleteAreaData Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	filter := bson.M{"AreaID": AreaInfo.AreaID}
+	_, err := ac.AreaMongoDB.DeleteOne("area_collection", filter)
+	if err != nil {
+		utils.MsgError("        [AreaController]DeleteAreaData DeleteOne error!")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Mongo delete one failed"})
+	}
+
+	_, mysqlErr := ac.AreaMysql.ExecuteCmd(
+		fmt.Sprintf("DELETE FROM systemdb.raster_table where AreaID = %d;",
+			AreaInfo.AreaID))
+	if mysqlErr != nil {
+		utils.MsgError("        [AreaController]DeleteAreaData delete mysql failed!")
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "delete mysql failed!"})
+	}
+
+	utils.MsgSuccess("        [AreaController]DeleteAreaData Successfully DeleteAreaData!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully DeleteAreaData!"})
+}
