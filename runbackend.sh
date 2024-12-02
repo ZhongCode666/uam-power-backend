@@ -1,6 +1,11 @@
 #!/bin/bash
 
 echo "Build and run!"
+
+echo "Run python"
+~/uam-gis-intelligence-service/runservice.sh
+echo "run python successfully ~/uam-gis-intelligence-service/runservice.sh"
+
 redis-cli FLUSHALL
 echo "delete redis data successfully"
 echo "Creating kafka topic!"
@@ -65,4 +70,8 @@ for cmd in "${transfer_gos[@]}"; do
     eval "nohup $HOME/uam-power-backend/$cmd > $log_dir/$cmd.log 2>&1 &"
 done
 
-echo "All programs are running. Logs are saved in $log_dir"
+
+# 创建 latest_log 的快捷方式
+ln -sfn "$log_dir" "$HOME/uam-power-backend/logs/latest_log"
+
+echo "All programs are running. Logs are saved in $log_dir, quick view with 'cd $HOME/uam-power-backend/logs/latest_log'"
