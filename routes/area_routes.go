@@ -18,6 +18,10 @@ func SetupAreaRoutes(
 	recApis.Post("/create", areaController.CreateArea)
 	recApis.Post("/delete", areaController.DeleteAreaData)
 	recApis.Post("/getInfo", areaController.GetAreaData)
-	recApis.Post("/updateOcc", areaController.UpdateRasterData)
+	recApis.Post("/updateOccupied", areaController.UpdateRasterDataOcc)
+	recApis.Post("/updateOK", areaController.UpdateRasterDataOK)
+	recApis.Post("/updateBarrier", areaController.UpdateRasterDataBarrier)
+	recApis.Post("/updateBan", areaController.UpdateRasterDataBan)
+
 	utils.MsgSuccess("    [SetupDataAreaRoutes]Successfully init!")
 }

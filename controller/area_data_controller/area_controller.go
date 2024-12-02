@@ -143,25 +143,76 @@ func (ac *AreaController) GetAreaData(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully GetAreaData!", "data": returnData})
 }
 
-func (ac *AreaController) UpdateRasterData(c *fiber.Ctx) error {
+func (ac *AreaController) UpdateRasterStatus(AreaID int, RasterIDs []int, Status string) error {
+	sql := fmt.Sprintf(
+		"Update raster_table set Status = '%s' where AreaID = %d and RasterID in %s and Status != '%s';",
+		Status, AreaID,
+		"("+strings.Trim(strings.Join(strings.Fields(fmt.Sprint(RasterIDs)), ", "), "[]")+")",
+		Status,
+	)
+	_, MysqlErr := ac.AreaMysql.ExecuteCmd(sql)
+	return MysqlErr
+}
+
+func (ac *AreaController) UpdateRasterDataOcc(c *fiber.Ctx) error {
 	var UpdateRasterData area_model.RasterData
+
 	if err := c.BodyParser(&UpdateRasterData); err != nil {
-		utils.MsgError("        [AreaController]UpdateRasterData Invalid Request JSON data")
+		utils.MsgError("        [AreaController]UpdateRasterDataOcc Invalid Request JSON data")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
-	sql := fmt.Sprintf(
-		"Update raster_table set Status = 'Occupied' where AreaID = %d and RasterID in %s;",
-		UpdateRasterData.AreaID,
-		"("+strings.Trim(strings.Join(strings.Fields(fmt.Sprint(UpdateRasterData.RasterIDs)), ", "), "[]")+")",
-	)
-	//utils.MsgSuccess(sql)
-	_, MysqlErr := ac.AreaMysql.ExecuteCmd(sql)
+	MysqlErr := ac.UpdateRasterStatus(UpdateRasterData.AreaID, UpdateRasterData.RasterIDs, "Occupied")
 	if MysqlErr != nil {
-		utils.MsgError("        [AreaController]UpdateRasterData Update Raster to Mysql failed")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Update Raster to Mysql failed"})
+		utils.MsgError("        [AreaController]UpdateRasterDataOcc Insert to mysql failed")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Insert to mysql failed!"})
 	}
-	utils.MsgSuccess("        [AreaController]UpdateRasterData Successfully UpdateRasterData!")
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully UpdateRasterData!"})
+	utils.MsgSuccess("        [AreaController]UpdateRasterDataOcc Successfully UpdateRasterDataOcc!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully UpdateRasterDataOcc!"})
+}
+
+func (ac *AreaController) UpdateRasterDataBan(c *fiber.Ctx) error {
+	var UpdateRasterData area_model.RasterData
+	if err := c.BodyParser(&UpdateRasterData); err != nil {
+		utils.MsgError("        [AreaController]UpdateRasterDataBan Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	MysqlErr := ac.UpdateRasterStatus(UpdateRasterData.AreaID, UpdateRasterData.RasterIDs, "Ban")
+	if MysqlErr != nil {
+		utils.MsgError("        [AreaController]UpdateRasterDataBan Insert to mysql failed")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Insert to mysql failed!"})
+	}
+	utils.MsgSuccess("        [AreaController]UpdateRasterDataBan Successfully UpdateRasterDataBan!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully UpdateRasterDataBan!"})
+}
+
+func (ac *AreaController) UpdateRasterDataOK(c *fiber.Ctx) error {
+	var UpdateRasterData area_model.RasterData
+	if err := c.BodyParser(&UpdateRasterData); err != nil {
+		utils.MsgError("        [AreaController]UpdateRasterDataOK Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	MysqlErr := ac.UpdateRasterStatus(UpdateRasterData.AreaID, UpdateRasterData.RasterIDs, "OK")
+	if MysqlErr != nil {
+		utils.MsgError("        [AreaController]UpdateRasterDataOK Insert to mysql failed")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Insert to mysql failed!"})
+	}
+	utils.MsgSuccess("        [AreaController]UpdateRasterDataOK Successfully UpdateRasterDataOK!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully UpdateRasterDataOK!"})
+}
+
+func (ac *AreaController) UpdateRasterDataBarrier(c *fiber.Ctx) error {
+	var UpdateRasterData area_model.RasterData
+	if err := c.BodyParser(&UpdateRasterData); err != nil {
+		utils.MsgError("        [AreaController]UpdateRasterDataBarrier Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	MysqlErr := ac.UpdateRasterStatus(UpdateRasterData.AreaID, UpdateRasterData.RasterIDs, "Barrier")
+	if MysqlErr != nil {
+		utils.MsgError("        [AreaController]UpdateRasterDataBarrier Insert to mysql failed")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Insert to mysql failed!"})
+	}
+	utils.MsgSuccess("        [AreaController]UpdateRasterDataBarrier Successfully UpdateRasterDataBarrier!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully UpdateRasterDataBarrier!"})
 }
 
 func (ac *AreaController) DeleteAreaData(c *fiber.Ctx) error {
