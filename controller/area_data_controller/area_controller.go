@@ -46,47 +46,49 @@ func NewAreaController(
 	}
 }
 
-func (ac *AreaController) CreateArea(c *fiber.Ctx) error {
+func (ac *AreaController) GenerateAreaID(Name string) (int, error) {
 	curStr := utils.GetTimeStr()
 	randStr := curStr + "-" + utils.GetUniqueStr()
-	var createAreaData area_model.CreateArea
-	if err := c.BodyParser(&createAreaData); err != nil {
-		utils.MsgError("        [AreaController]CreateArea Invalid Request JSON data")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
-	}
 	_, err := ac.AreaMysql.ExecuteCmd(
 		fmt.Sprintf("INSERT INTO systemdb.area_table(Name, TimeStr) VALUES ('%s', '%s');",
-			createAreaData.Name, randStr,
+			Name, randStr,
 		))
 	if err != nil {
-		utils.MsgError("        [AreaController]CreateArea Create Area Failed!")
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Insert MySql failed"})
+		utils.MsgError("        [AreaController]GenerateAreaID CreateID Area Failed!")
+		return -1, err
 	}
 	mysqlRe, mysqlErr := ac.AreaMysql.QueryRow(
 		fmt.Sprintf("Select * from systemdb.area_table where TimeStr = '%s';",
 			randStr))
 	if mysqlErr != nil {
-		utils.MsgError("        [AreaController]CreateArea Query sql failed!")
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "N.A.!"})
+		utils.MsgError("        [AreaController]GenerateAreaID Query sql failed!")
+		return -1, mysqlErr
 	}
 	jsonData, _ := json.Marshal(mysqlRe)
 	var mysqlData area_model.AreaMysqlModel
 	err = json.Unmarshal(jsonData, &mysqlData)
 	if err != nil {
-		utils.MsgError("        [AreaController]CreateArea Unmarshal Json data failed")
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Invalid MySql Data"})
+		utils.MsgError("        [AreaController]GenerateAreaID Unmarshal Json data failed")
+		return -1, err
 	}
+	return mysqlData.AreaID, nil
+}
+
+func (ac *AreaController) UpdateAreaData(
+	AreaID int, RangeData []float64, RasterSize []float64, RasterIndex [][][]int,
+	RasterData map[int]area_model.SingleRasterData,
+) error {
 	document := bson.M{
-		"AreaID": mysqlData.AreaID, "RangeData": createAreaData.RangeData,
-		"RasterSize": createAreaData.RasterSize, "RasterIndex": createAreaData.RasterIndex,
+		"AreaID": AreaID, "RangeData": RangeData,
+		"RasterSize": RasterSize, "RasterIndex": RasterIndex,
 	}
-	_, err = ac.AreaMongoDB.InsertOne("area_collection", document)
-	if err != nil {
-		utils.MsgError("        [AreaController]CreateArea Insert Mongo failed")
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Insert Mongo failed"})
+	_, MErr := ac.AreaMongoDB.InsertOne("area_collection", document)
+	if MErr != nil {
+		utils.MsgError("        [AreaController]GenerateAreaID Insert Mongo failed")
+		return MErr
 	}
 	var values []string
-	for id, record := range createAreaData.RasterData {
+	for id, record := range RasterData {
 		status := record.Status
 		longitude := record.Longitude
 		latitude := record.Latitude
@@ -97,7 +99,7 @@ func (ac *AreaController) CreateArea(c *fiber.Ctx) error {
 			values,
 			fmt.Sprintf(
 				"(%d, %d, %.12f, %.12f, %.12f, '%s')",
-				id, mysqlData.AreaID, longitude, latitude, altitude, status,
+				id, AreaID, longitude, latitude, altitude, status,
 			))
 	}
 
@@ -107,11 +109,65 @@ func (ac *AreaController) CreateArea(c *fiber.Ctx) error {
 		strings.Join(values, ", "))
 	_, MysqlErr := ac.AreaMysql.ExecuteCmd(sql)
 	if MysqlErr != nil {
-		utils.MsgError("        [AreaController]CreateArea Insert Raster to Mysql failed err>" + MysqlErr.Error())
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Insert Raster to Mysql failed"})
+		utils.MsgError("        [AreaController]GenerateAreaID Insert Raster to Mysql failed err>" + MysqlErr.Error())
+		return MysqlErr
+	}
+	return nil
+}
+
+func (ac *AreaController) CreateAreaID(c *fiber.Ctx) error {
+	var createAreaData area_model.GenerateAreaID
+	if err := c.BodyParser(&createAreaData); err != nil {
+		utils.MsgError("        [AreaController]CreateAreaID Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	AreaID, GenErr := ac.GenerateAreaID(createAreaData.Name)
+	if GenErr != nil {
+		utils.MsgError("        [AreaController]CreateAreaID Generate AreaID failed")
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Generate AreaID failed"})
+	}
+	utils.MsgSuccess("        [AreaController]CreateAreaID Successfully CreateAreaID!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully CreateAreaID!", "data": bson.M{"AreaID": AreaID}})
+}
+
+func (ac *AreaController) UploadArea(c *fiber.Ctx) error {
+	var createAreaData area_model.UploadArea
+	if err := c.BodyParser(&createAreaData); err != nil {
+		utils.MsgError("        [AreaController]UploadArea Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	err := ac.UpdateAreaData(
+		createAreaData.AreaID, createAreaData.RangeData,
+		createAreaData.RasterSize, createAreaData.RasterIndex,
+		createAreaData.RasterData,
+	)
+	if err != nil {
+		utils.MsgError("        [AreaController]UploadArea Insert data failed")
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Insert data failed"})
+	}
+	utils.MsgSuccess("        [AreaController]UploadArea Successfully CreateAreaID!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully UploadArea!"})
+}
+
+func (ac *AreaController) CreateArea(c *fiber.Ctx) error {
+	var createAreaData area_model.CreateArea
+	if err := c.BodyParser(&createAreaData); err != nil {
+		utils.MsgError("        [AreaController]CreateArea Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	AreaID, GenErr := ac.GenerateAreaID(createAreaData.Name)
+	if GenErr != nil {
+		utils.MsgError("        [AreaController]CreateArea Generate AreaID failed")
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Generate AreaID failed"})
+	}
+	err := ac.UpdateAreaData(AreaID, createAreaData.RangeData, createAreaData.RasterSize, createAreaData.RasterIndex,
+		createAreaData.RasterData)
+	if err != nil {
+		utils.MsgError("        [AreaController]CreateArea Insert data failed")
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Insert data failed"})
 	}
 	utils.MsgSuccess("        [AreaController]CreateArea Successfully CreateLane!")
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully CreateArea!", "data": mysqlRe})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully CreateArea!", "data": bson.M{"AreaID": AreaID}})
 }
 
 func (ac *AreaController) GetAreaData(c *fiber.Ctx) error {

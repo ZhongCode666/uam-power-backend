@@ -1,44 +1,44 @@
-KafkaCfg:
-  Addr: "127.0.0.1:9092"
-  AircraftDataTopic: "AircraftData10Area"
-  AircraftEventTopic: "AircraftEvent10Area"
-  NumEventProducers: 5
-  NumDataProducers: 25
-RedisCfg:
-  Port: 6379
-  StatusDBno: 5
-  EventDBno: 6
-  AircraftDBno: 7
-  TaskInfoDBno: 8
-  Host: "127.0.0.1"
-MySqlCfg:
-  Usr: "go"
-  Psw: "Zhonglaoshizhen6!"
-  Host: "127.0.0.1"
-  DB: "systemdb"
-  FlightDB: "flightdb"
-  EventDB: "eventdb"
-  Port: 3306
-  FlightColumn: [ "Longitude", "Latitude", "Altitude", "Yaw", "DataTime" ]
-  EventColumn: [ "DataTime", "Event" ]
-  FlightInterval: 30
-  EventInterval: 120
-ClickHouseCfg:
-  Host: "127.0.0.1"
-  Port: 9000
-  Username: "default"
-  Password: "Zhonglaoshizhen6!"
-  FlightDatabase: "flightdb"
-  EventDatabase: "eventdb"
-  BatchSize: 10
-  EventBatchSize: 5
-  FlushPeriod: 1
-  EventFlushPeriod: 1
-  FlightColumn: ["Longitude", "Latitude", "Altitude", "Yaw", "DataTime"]
-  EventColumn: ["DataTime", "Event"]
-MongoCfg:
-  Host: "127.0.0.1"
-  Port: 27777
-  Usr: "admin"
-  Psw: "21312085PengChengJing!"
-  AreaDB: "areadb"
+KafkaCfg: # Kafka 配置
+  Addr: "127.0.0.1:9092" # Kafka 地址
+  AircraftDataTopic: "AircraftData10Area" # 飞机数据主题
+  AircraftEventTopic: "AircraftEvent10Area" # 飞机事件主题
+  NumEventProducers: 5 # 事件生产者数量
+  NumDataProducers: 25 # 数据生产者数量
+RedisCfg: # Redis 配置
+  Port: 6379 # Redis 端口
+  StatusDBno: 5 # 状态数据库编号
+  EventDBno: 6 # 事件数据库编号
+  AircraftDBno: 7 # 飞机数据库编号
+  TaskInfoDBno: 8 # 任务信息数据库编号
+  Host: "127.0.0.1" # Redis 主机地址
+MySqlCfg: # MySQL 配置
+  Usr: "go" # 用户名
+  Psw: "Zhonglaoshizhen6!" # 密码
+  Host: "127.0.0.1" # MySQL 主机地址
+  DB: "systemdb" # 系统数据库
+  FlightDB: "flightdb" # 飞行数据库
+  EventDB: "eventdb" # 事件数据库
+  Port: 3306 # MySQL 端口
+  FlightColumn: [ "Longitude", "Latitude", "Altitude", "Yaw", "DataTime" ] # 飞行数据列
+  EventColumn: [ "DataTime", "Event" ] # 事件数据列
+  FlightInterval: 30 # 飞行数据间隔
+  EventInterval: 120 # 事件数据间隔
+ClickHouseCfg: # ClickHouse 配置
+  Host: "127.0.0.1" # ClickHouse 主机地址
+  Port: 9000 # ClickHouse 端口
+  Username: "default" # 用户名
+  Password: "Zhonglaoshizhen6!" # 密码
+  FlightDatabase: "flightdb" # 飞行数据库
+  EventDatabase: "eventdb" # 事件数据库
+  BatchSize: 10 # 批处理大小
+  EventBatchSize: 5 # 事件批处理大小
+  FlushPeriod: 1 # 刷新周期
+  EventFlushPeriod: 1 # 事件刷新周期
+  FlightColumn: ["Longitude", "Latitude", "Altitude", "Yaw", "DataTime"] # 飞行数据列
+  EventColumn: ["DataTime", "Event"] # 事件数据列
+MongoCfg: # MongoDB 配置
+  Host: "127.0.0.1" # MongoDB 主机地址
+  Port: 27777 # MongoDB 端口
+  Usr: "admin" # 用户名
+  Psw: "21312085PengChengJing!" # 密码
+  AreaDB: "areadb" # 区域数据库

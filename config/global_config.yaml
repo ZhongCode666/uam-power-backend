@@ -1,10 +1,10 @@
-EventKafkaPartitionNum: 5
-DataKafkaPartitionNum: 25
-DBConfigPath: "config/db_config.yaml"
-DataUploadPort: 26969
-DataReceivePort: 26868
-IDPort: 27070
-TaskPort: 27171
-LanePort: 27272
-AreaPort: 27373
-SaveLogToFile: False
+1 :EventKafkaPartitionNum: 5 # 事件 Kafka 分区数量
+2 :DataKafkaPartitionNum: 25 # 数据 Kafka 分区数量
+3 :DBConfigPath: "config/db_config.yaml" # 数据库配置路径
+4 :DataUploadPort: 26969 # 数据上传端口
+5 :DataReceivePort: 26868 # 数据接收端口
+6 :IDPort: 27070 # ID 端口
+7 :TaskPort: 27171 # 任务端口
+8 :LanePort: 27272 # 车道端口
+9 :AreaPort: 27373 # 区域端口
+10:SaveLogToFile: False # 是否保存日志到文件

@@ -22,6 +22,8 @@ func SetupAreaRoutes(
 	// 创建一个新的路由组 /area
 	recApis := r.Group("/area")
 	recApis.Post("/create", areaController.CreateArea)                     // 创建区域
+	recApis.Post("/generateAreaID", areaController.CreateAreaID)           // 生成 AreaID
+	recApis.Post("/uploadAreaData", areaController.UploadArea)             // 上传区域数据
 	recApis.Post("/delete", areaController.DeleteAreaData)                 // 删除区域数据
 	recApis.Post("/getInfo", areaController.GetAreaData)                   // 获取区域数据
 	recApis.Post("/updateOccupied", areaController.UpdateRasterDataOcc)    // 更新占用数据
