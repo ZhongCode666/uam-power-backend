@@ -12,10 +12,12 @@ func main() {
 	GlobalConfigPath := "config/global_config.yaml"
 	GlobalCfg, loadCfgErr := utils.LoadGlobalConfig(GlobalConfigPath)
 	if loadCfgErr != nil {
+		utils.MsgError("[AreaAPIs]setting up area routes failed: >" + loadCfgErr.Error())
 		return
 	}
 	cfg, loadCfgErr := utils.LoadDBConfig(GlobalCfg.DBConfigPath)
 	if loadCfgErr != nil {
+		utils.MsgError("[AreaAPIs]setting up area routes failed: >" + loadCfgErr.Error())
 		return
 	}
 	utils.MsgSuccess("[main_server]load DB config successfully!")

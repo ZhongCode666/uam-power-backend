@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 	"sync/atomic"
+	"uam-power-backend/utils"
 )
 
 // KafkaManager 管理多个生产者的 Kafka 类
@@ -66,6 +67,7 @@ func (km *KafkaManager) SendMsgRoundRobin(message string) error {
 func (km *KafkaManager) Close() error {
 	for _, producer := range km.producers {
 		if err := producer.Close(); err != nil {
+			utils.MsgError("        [KafkaManager]close producer failed: >" + err.Error())
 			return err // 如果关闭失败，返回错误
 		}
 	}

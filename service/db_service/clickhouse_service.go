@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"uam-power-backend/utils"
 )
 
 // ClickHouse 封装类，包含缓冲区功能
@@ -47,6 +48,7 @@ func NewClickHouse(
 
 	// 测试连接
 	if err := conn.Ping(); err != nil {
+		utils.MsgError("        [ClickHouse]ping failed: >" + err.Error())
 		return nil, fmt.Errorf("failed to ping ClickHouse: %w", err) // 如果连接失败，返回错误
 	}
 
@@ -94,6 +96,7 @@ func (ch *ClickHouse) Add(table string, columns []string, row []interface{}) err
 func (ch *ClickHouse) ExecuteCmd(sql string) error {
 	// 执行 SQL 命令
 	if _, err := ch.conn.Exec(sql); err != nil {
+		utils.MsgError("        [ClickHouse]execute failed: >" + err.Error())
 		return err // 如果执行失败，返回错误
 	}
 	return nil // 返回 nil 表示成功
@@ -167,6 +170,7 @@ func (ch *ClickHouse) Close() error {
 		columns := ch.getColumnsForTable()
 		// 刷新表的数据
 		if err := ch.flushTable(table, columns); err != nil {
+			utils.MsgError("        [ClickHouse]flush table failed: >" + err.Error())
 			// 打印错误信息
 			fmt.Printf("Failed to flush table %s: %v\n", table, err)
 		}

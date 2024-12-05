@@ -16,6 +16,7 @@ func SetupAreaRoutes(
 	mongoCfg *db_config_model.MongoConfigModel,
 	mysqlCfg *db_config_model.MySqlConfigModel,
 ) {
+	utils.MsgInfo("    [SetupAreaRoutes]setting up area routes...")
 	// 创建一个新的 AreaController 实例
 	areaController := area_data_controller.NewAreaController(mongoCfg, mysqlCfg)
 

@@ -15,6 +15,7 @@ func SetupAircraftIdRoutes(
 	r *fiber.App, RedisCfg *db_config_model.RedisConfigModel,
 	MySqlCfg *db_config_model.MySqlConfigModel,
 ) {
+	utils.MsgInfo("    [SetupAircraftIdRoutes]setting up aircraft ID routes...")
 	// 创建一个新的 AircraftIdController 实例
 	aircraftIDController := aircraft_id_controller.NewAircraftIdController(MySqlCfg, RedisCfg)
 

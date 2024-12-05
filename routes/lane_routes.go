@@ -16,6 +16,7 @@ func SetupLaneRoutes(
 	mongoCfg *db_config_model.MongoConfigModel,
 	mysqlCfg *db_config_model.MySqlConfigModel,
 ) {
+	utils.MsgInfo("    [SetupDataLaneRoutes]setting up lane routes...")
 	// 创建一个新的 LaneController 实例
 	laneController := lane_controller.NewLaneController(mongoCfg, mysqlCfg)
 

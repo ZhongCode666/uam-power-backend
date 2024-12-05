@@ -30,6 +30,7 @@ func NewMySQLWithBufferService(dsn string, interval int, columns []string) (*MyS
 		return nil, err // 如果打开数据库连接失败，返回错误
 	}
 	if err := db.Ping(); err != nil {
+		utils.MsgError("          [MySQLWithBufferService]ping failed: >" + err.Error())
 		return nil, err // 如果数据库连接不可用，返回错误
 	}
 	db.SetConnMaxLifetime(30 * time.Second) // 设置连接的最大生命周期为 30 秒
@@ -107,6 +108,7 @@ func (b *MySQLWithBufferService) InsertMany(table string, rows [][]interface{}) 
 	// 使用 b.db.Exec 执行批量插入
 	_, err := b.db.Exec(insertSql)
 	if err != nil {
+		utils.MsgError("          [MySQLWithBufferService]insert to mysql error " + err.Error()) // 如果插入失败，输出错误消息
 		return fmt.Errorf("插入表 %s 失败: %w", table, err)
 	}
 	return nil

@@ -3,6 +3,7 @@ package dbservice
 import (
 	"context"
 	"github.com/segmentio/kafka-go"
+	"uam-power-backend/utils"
 )
 
 // KafkaConsumer 封装 Kafka 消费者
@@ -30,6 +31,7 @@ func NewKafkaConsumer(addr, topic, groupID string) *KafkaConsumer {
 func (c *KafkaConsumer) ReceiveMessage(ctx context.Context) (string, error) {
 	msg, err := c.reader.ReadMessage(ctx) // 从 Kafka 读取消息
 	if err != nil {
+		utils.MsgError("        [KafkaReceiveMessage]read message failed: >" + err.Error())
 		return "", err // 如果读取失败，返回错误
 	}
 	return string(msg.Value), nil // 返回消息的值（字符串形式）

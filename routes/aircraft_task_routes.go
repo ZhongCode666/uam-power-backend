@@ -17,6 +17,7 @@ func SetupAircraftTaskRoutes(
 	MySqlCfg *db_config_model.MySqlConfigModel,
 	ClickHouse *db_config_model.ClickHouseConfigModel,
 ) {
+	utils.MsgInfo("    [SetupAircraftTaskRoutes]setting up aircraft task routes...")
 	// 创建一个新的 AircraftTaskController 实例
 	aircraftTaskController := aircraft_task_controller.NewAircraftTaskModel(RedisCfg, MySqlCfg)
 	// aircraftTaskController := aircraft_task_controller.NewAircraftTaskModelClickHouse(RedisCfg, MySqlCfg, ClickHouse)

@@ -51,6 +51,7 @@ func NewKafkaToClickhouse(
 		ClickHouseConfig.BatchSize, ClickHouseConfig.FlushPeriod, ClickHouseConfig.FlightDatabase, true,
 		ClickHouseConfig.FlightColumn)
 	if FlightErr != nil {
+		utils.MsgError("        [KafkaToMysql]Failed to init MySQLWithBufferService!")
 		return nil
 	}
 	EventClickHouseService, EventErr := dbservice.NewClickHouse(
@@ -58,6 +59,7 @@ func NewKafkaToClickhouse(
 		ClickHouseConfig.EventBatchSize, ClickHouseConfig.EventFlushPeriod, ClickHouseConfig.EventDatabase, true,
 		ClickHouseConfig.EventColumn)
 	if EventErr != nil {
+		utils.MsgError("        [KafkaToMysql]Failed to init MySQLWithBufferService!")
 		return nil
 	}
 

@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
+	"uam-power-backend/utils"
 )
 
 // MongoDBClient 是 MongoDB 操作类
@@ -27,6 +28,7 @@ func NewMongoDBClient(URI string, DB string) (*MongoDBClient, error) {
 	// 使用 mongo.Connect() 来创建新的 MongoDB 客户端
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
+		utils.MsgError("        [MongoDBClient]connect failed: >" + err.Error())
 		return nil, err
 	}
 
@@ -35,6 +37,7 @@ func NewMongoDBClient(URI string, DB string) (*MongoDBClient, error) {
 	defer cancel()
 	err = client.Ping(ctx, nil)
 	if err != nil {
+		utils.MsgError("        [MongoDBClient]ping failed: >" + err.Error())
 		return nil, err
 	}
 
@@ -64,6 +67,7 @@ func (mongoDb *MongoDBClient) InsertOne(collection string, document interface{})
 
 	result, err := coll.InsertOne(ctx, document) // 插入文档
 	if err != nil {
+		utils.MsgError("        [MongoDBInsertOne]insert one failed: >" + err.Error())
 		return nil, err // 如果插入失败，返回错误
 	}
 	return result, nil // 返回插入结果
@@ -81,9 +85,11 @@ func (mongoDb *MongoDBClient) FindOne(collection string, filter interface{}) (bs
 	result := coll.FindOne(ctx, filter) // 查找一条数据
 	err := result.Decode(&re)           // 解码查询结果
 	if err != nil {
+		utils.MsgError("        [MongoDBFindOne]find one failed: >" + err.Error())
 		return nil, err // 如果解码失败，返回错误
 	}
 	if result.Err() != nil {
+		utils.MsgError("        [MongoDBFindOne]find one failed: >" + result.Err().Error())
 		return nil, result.Err() // 如果查询结果有错误，返回错误
 	}
 	return re, nil // 返回查询结果
@@ -102,9 +108,11 @@ func (mongoDb *MongoDBClient) FindOneWithDropRow(collection string, filter inter
 	result := coll.FindOne(ctx, filter, options.FindOne().SetProjection(dropRows)) // 查找一条数据并排除指定字段
 	err := result.Decode(&re)                                                      // 解码查询结果
 	if err != nil {
+		utils.MsgError("        [MongoDBFindOneWithDropRow]find one with drop row failed: >" + err.Error())
 		return nil, err // 如果解码失败，返回错误
 	}
 	if result.Err() != nil {
+		utils.MsgError("        [MongoDBFindOneWithDropRow]find one with drop row failed: >" + result.Err().Error())
 		return nil, result.Err() // 如果查询结果有错误，返回错误
 	}
 	return re, nil // 返回查询结果
@@ -122,6 +130,7 @@ func (mongoDb *MongoDBClient) UpdateOne(collection string, filter interface{}, u
 
 	result, err := coll.UpdateOne(ctx, filter, update) // 更新一条数据
 	if err != nil {
+		utils.MsgError("        [MongoDBUpdateOne]update failed: >" + err.Error())
 		return nil, err // 如果更新失败，返回错误
 	}
 	return result, nil // 返回更新结果
@@ -139,6 +148,7 @@ func (mongoDb *MongoDBClient) Update(collection string, filter interface{}, upda
 
 	result, err := coll.UpdateMany(ctx, filter, update) // 更新多条数据
 	if err != nil {
+		utils.MsgError("        [MongoDBUpdate]update failed: >" + err.Error())
 		return nil, err // 如果更新失败，返回错误
 	}
 	return result, nil // 返回更新结果
@@ -155,6 +165,7 @@ func (mongoDb *MongoDBClient) DeleteOne(collection string, filter interface{}) (
 
 	result, err := coll.DeleteOne(ctx, filter) // 删除一条数据
 	if err != nil {
+		utils.MsgError("        [MongoDBDeleteOne]delete failed: >" + err.Error())
 		return nil, err // 如果删除失败，返回错误
 	}
 	return result, nil // 返回删除结果
@@ -171,6 +182,7 @@ func (mongoDb *MongoDBClient) Delete(collection string, filter interface{}) (*mo
 
 	result, err := coll.DeleteMany(ctx, filter) // 删除多条数据
 	if err != nil {
+		utils.MsgError("        [MongoDBDelete]delete failed: >" + err.Error())
 		return nil, err // 如果删除失败，返回错误
 	}
 	return result, nil // 返回删除结果
@@ -187,17 +199,19 @@ func (mongoDb *MongoDBClient) FindAll(collection string, filter interface{}) ([]
 
 	cursor, err := coll.Find(ctx, filter) // 查找所有符合过滤器的数据
 	if err != nil {
+		utils.MsgError("        [MongoDBFindAll]find all failed: >" + err.Error())
 		return nil, err // 如果查找失败，返回错误
 	}
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx) // 关闭游标
 		if err != nil {
-
+			utils.MsgError("        [MongoDBFindAll]close cursor failed: >" + err.Error())
 		}
 	}(cursor, ctx)
 
 	var results []bson.M
 	if err := cursor.All(ctx, &results); err != nil {
+		utils.MsgError("        [MongoDBFindAll]find all failed: >" + err.Error())
 		return nil, err // 如果解码失败，返回错误
 	}
 	return results, nil // 返回查找到的文档切片
@@ -215,17 +229,19 @@ func (mongoDb *MongoDBClient) FindAllWithDrops(collection string, filter interfa
 
 	cursor, err := coll.Find(ctx, filter, options.Find().SetProjection(drops)) // 查找所有符合过滤器的数据并排除指定字段
 	if err != nil {
+		utils.MsgError("        [MongoDBFindAllWithDrops]find all with drops failed: >" + err.Error())
 		return nil, err // 如果查找失败，返回错误
 	}
 	defer func(cursor *mongo.Cursor, ctx context.Context) {
 		err := cursor.Close(ctx) // 关闭游标
 		if err != nil {
-
+			utils.MsgError("        [MongoDBFindAllWithDrops]close cursor failed: >" + err.Error())
 		}
 	}(cursor, ctx)
 
 	var results []bson.M
 	if err := cursor.All(ctx, &results); err != nil {
+		utils.MsgError("        [MongoDBFindAllWithDrops]find all with drops failed: >" + err.Error())
 		return nil, err // 如果解码失败，返回错误
 	}
 	return results, nil // 返回查找到的文档切片
@@ -238,6 +254,7 @@ func (mongoDb *MongoDBClient) CreateCollection(collectionName string) error {
 	// 检查集合是否已存在
 	collections, err := mongoDb.db.ListCollectionNames(context.Background(), bson.M{})
 	if err != nil {
+		utils.MsgError("        [MongoDBCreateCollection]list collection names failed: >" + err.Error())
 		return err // 如果获取集合名称列表失败，返回错误
 	}
 
@@ -251,6 +268,7 @@ func (mongoDb *MongoDBClient) CreateCollection(collectionName string) error {
 	// 创建新集合
 	err = mongoDb.db.CreateCollection(context.Background(), collectionName)
 	if err != nil {
+		utils.MsgError("        [MongoDBCreateCollection]create collection failed: >" + err.Error())
 		return err // 如果创建集合失败，返回错误
 	}
 
@@ -268,6 +286,7 @@ func (mongoDb *MongoDBClient) DropCollection(collectionName string) error {
 	// 删除集合
 	err := collection.Drop(context.Background())
 	if err != nil {
+		utils.MsgError("        [MongoDBDropCollection]drop collection failed: >" + err.Error())
 		return fmt.Errorf("删除集合失败: %v", err)
 	}
 

@@ -13,6 +13,7 @@ import (
 func SetupUploadFlowRoutes(
 	r *fiber.App, kafkaCfg *db_config_model.KafkaConfigModel,
 ) {
+	utils.MsgInfo("    [SetupDataLaneRoutes]setting up upload routes...")
 	// 创建一个新的 UploadAircraftController 实例
 	aircraftUploadController := aircraft_data_controller.NewUploadAircraftController(kafkaCfg)
 
@@ -38,6 +39,7 @@ func SetupReceiveFlowRoutes(
 	r *fiber.App,
 	redisCfg *db_config_model.RedisConfigModel, mysqlCfg *db_config_model.MySqlConfigModel,
 ) {
+	utils.MsgInfo("    [SetupReceiveFlowRoutes]setting up receive routes...")
 	// 创建一个新的 ReceiveAircraft 实例
 	aircraftReqController := aircraft_data_controller.NewReceiveAircraft(redisCfg, mysqlCfg)
 

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"time"
+	"uam-power-backend/utils"
 )
 
 // MySQLService 结构体，包含一个数据库连接对象
@@ -17,9 +18,11 @@ type MySQLService struct {
 func NewMySQLService(dsn string) (*MySQLService, error) {
 	db, err := sql.Open("mysql", dsn) // 打开数据库连接
 	if err != nil {
+		utils.MsgError("        [MySQLService]open failed: >" + err.Error())
 		return nil, err // 如果打开数据库连接失败，返回错误
 	}
 	if err := db.Ping(); err != nil {
+		utils.MsgError("        [MySQLService]ping failed: >" + err.Error())
 		return nil, err // 如果数据库连接不可用，返回错误
 	}
 	db.SetMaxIdleConns(5)                   // 设置最大空闲连接数为 5
@@ -32,6 +35,7 @@ func NewMySQLService(dsn string) (*MySQLService, error) {
 func (s *MySQLService) ExecuteCmd(sql string) (int, error) {
 	result, err := s.db.Exec(sql) // 执行 SQL 命令
 	if err != nil {
+		utils.MsgError("        [MySQLExecuteCmd]execute failed: >" + err.Error())
 		return 0, err // 如果执行失败，返回错误
 	}
 	id, _ := result.RowsAffected() // 获取受影响的行数
@@ -46,17 +50,20 @@ func (s *MySQLService) QueryRow(query string, args ...interface{}) (map[string]i
 	// 执行查询
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
+		utils.MsgError("        [MySQLQueryRow]query failed: >" + err.Error())
 		return nil, err // 如果查询失败，返回错误
 	}
 
 	// 获取列名
 	columns, err := rows.Columns()
 	if err != nil {
+		utils.MsgError("        [MySQLQueryRow]get columns failed: >" + err.Error())
 		return nil, err // 如果获取列名失败，返回错误
 	}
 
 	// 移动到第一行
 	if !rows.Next() {
+		utils.MsgError("        [MySQLQueryRow]no rows found")
 		return nil, sql.ErrNoRows // 如果没有结果，返回 sql.ErrNoRows
 	}
 
@@ -69,6 +76,7 @@ func (s *MySQLService) QueryRow(query string, args ...interface{}) (map[string]i
 
 	// 扫描查询结果到 values 中
 	if err := rows.Scan(valuePtrs...); err != nil {
+		utils.MsgError("        [MySQLQueryRow]scan failed: >" + err.Error())
 		return nil, err // 如果扫描失败，返回错误
 	}
 
@@ -96,12 +104,14 @@ func (s *MySQLService) QueryRows(query string, args ...interface{}) (map[string]
 	// 执行查询
 	rows, err := s.db.Query(query, args...)
 	if err != nil {
+		utils.MsgSuccess("        [MySQLQueryRows]query failed: >" + err.Error())
 		return nil, err
 	}
 
 	// 获取列名
 	columns, err := rows.Columns()
 	if err != nil {
+		utils.MsgError("        [MySQLQueryRows]get columns failed: >" + err.Error())
 		return nil, err
 	}
 
@@ -122,6 +132,7 @@ func (s *MySQLService) QueryRows(query string, args ...interface{}) (map[string]
 
 		// 扫描每行数据到 values 中
 		if err := rows.Scan(valuePtrs...); err != nil {
+			utils.MsgError("        [MySQLQueryRows]scan rows failed: >" + err.Error())
 			return nil, err
 		}
 
@@ -139,6 +150,7 @@ func (s *MySQLService) QueryRows(query string, args ...interface{}) (map[string]
 
 	// 检查是否有错误
 	if err := rows.Err(); err != nil {
+		utils.MsgError("        [MySQLQueryRows]rows error: >" + err.Error())
 		return nil, err
 	}
 

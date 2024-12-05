@@ -46,6 +46,7 @@ func NewKafkaToMysql(
 	// 初始化 MySQL 状态服务
 	FlightMysqlService, FlightErr := dbservice.NewMySQLWithBufferService(mysqlLink, MySqlConfig.FlightInterval, MySqlConfig.FlightColumn)
 	if FlightErr != nil {
+		utils.MsgError("        [KafkaToMysql]Failed to init MySQLWithBufferService!")
 		return nil
 	}
 
@@ -58,6 +59,7 @@ func NewKafkaToMysql(
 	// 初始化 MySQL 事件服务
 	EventMysqlService, EventErr := dbservice.NewMySQLWithBufferService(mysqlLink, MySqlConfig.EventInterval, MySqlConfig.EventColumn)
 	if EventErr != nil {
+		utils.MsgError("        [KafkaToMysql]Failed to init MySQLWithBufferService!")
 		return nil
 	}
 

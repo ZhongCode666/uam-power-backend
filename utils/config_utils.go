@@ -13,12 +13,14 @@ import (
 func LoadDBConfig(filename string) (*db_config_model.DbConfigModel, error) {
 	data, err := os.ReadFile(filename) // 读取文件内容
 	if err != nil {
+		MsgError("                 [LoadDBConfig]Failed to read file: err> " + err.Error())
 		return nil, err // 如果读取文件出错，返回错误
 	}
 
 	var config db_config_model.DbConfigModel
 	err = yaml.Unmarshal(data, &config) // 解析 YAML 数据
 	if err != nil {
+		MsgError("                 [LoadDBConfig]Failed to read file: err> " + err.Error())
 		return nil, err // 如果解析出错，返回错误
 	}
 
@@ -31,12 +33,14 @@ func LoadDBConfig(filename string) (*db_config_model.DbConfigModel, error) {
 func LoadGlobalConfig(filename string) (*global_model_config_model.GlobalConfig, error) {
 	data, err := os.ReadFile(filename) // 读取文件内容
 	if err != nil {
+		MsgError("                 [LoadGlobalConfig]Failed to read file: err> " + err.Error())
 		return nil, err // 如果读取文件出错，返回错误
 	}
 
 	var config global_model_config_model.GlobalConfig
 	err = yaml.Unmarshal(data, &config) // 解析 YAML 数据
 	if err != nil {
+		MsgError("                 [LoadGlobalConfig]Failed to read file: err> " + err.Error())
 		return nil, err // 如果解析出错，返回错误
 	}
 

@@ -7,6 +7,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"strconv"
 	"time"
+	"uam-power-backend/utils"
 )
 
 // RedisDict 结构体表示一个 Redis 字典
@@ -37,6 +38,7 @@ func (r *RedisDict) Get(key string) (interface{}, error) {
 		// 如果键不存在，返回 nil
 		return nil, nil
 	} else if err != nil {
+		utils.MsgError("        [RedisGet]get key failed: >" + err.Error())
 		// 如果发生其他错误，返回错误
 		return nil, err
 	}
@@ -102,6 +104,7 @@ func (r *RedisDict) Set(key string, value interface{}) error {
 		// 如果是复杂类型（例如 map 或 list），则将其序列化为 JSON
 		jsonBytes, err := json.Marshal(value)
 		if err != nil {
+			utils.MsgError("        [RedisSet]marshal value failed: >" + err.Error())
 			return err
 		}
 		stringValue = string(jsonBytes)
@@ -141,6 +144,7 @@ func (r *RedisDict) SetWithDuration(key string, value interface{}, timeout int) 
 		// 如果是复杂类型（例如 map 或 list），则将其序列化为 JSON
 		jsonBytes, err := json.Marshal(value)
 		if err != nil {
+			utils.MsgError("        [RedisSetWithDuration]marshal value failed: >" + err.Error())
 			return err
 		}
 		stringValue = string(jsonBytes)
@@ -171,6 +175,7 @@ func (r *RedisDict) GetVals(keys []string) ([]interface{}, error) {
 	// 使用 MGet 命令从 Redis 中获取多个键的值
 	ReInterface, err := r.client.MGet(r.ctx, keys...).Result()
 	if err != nil {
+		utils.MsgError("        [RedisGetVals]get keys failed: >" + err.Error())
 		return nil, err
 	}
 	// 遍历结果并将每个值转换为适当的类型
@@ -188,10 +193,12 @@ func (r *RedisDict) Pop(key string) (interface{}, error) {
 	// 获取键的值
 	value, err := r.Get(key)
 	if err != nil {
+		utils.MsgError("        [RedisPop]get key failed: >" + err.Error())
 		return nil, err
 	}
 	// 删除键
 	if _, err := r.client.Del(r.ctx, key).Result(); err != nil {
+		utils.MsgError("        [RedisPop]delete key failed: >" + err.Error())
 		return nil, err
 	}
 	// 返回值
