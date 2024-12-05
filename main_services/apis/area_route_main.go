@@ -21,7 +21,7 @@ func main() {
 	utils.MsgSuccess("[main_server]load DB config successfully!")
 	app := fiber.New(fiber.Config{
 		// 设置请求体的最大大小（单位：字节）
-		BodyLimit: 100 * 1024 * 1024, // 50 MB
+		BodyLimit: 5 * 1024 * 1024 * 1024, // 50 MB
 	})
 	app.Use(cors.New())
 
