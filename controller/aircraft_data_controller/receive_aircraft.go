@@ -106,7 +106,7 @@ func (receiver *RequestAircraft) ReceiveActiveData(c *fiber.Ctx) error {
 	}
 	if len(keys) == 0 {
 		utils.MsgError("        [ReceiveAircraft]ReceiveActiveData No active aircraft!")
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "No active aircraft!"})
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "No active aircraft!"})
 	}
 	activateResult, GetValErr := receiver.StatusRedisService.GetVals(keys)
 	if GetValErr != nil {
@@ -129,7 +129,7 @@ func (receiver *RequestAircraft) ReceiveActiveEvent(c *fiber.Ctx) error {
 	}
 	if len(keys) == 0 {
 		utils.MsgError("        [ReceiveAircraft]ReceiveActiveEvent No active aircraft!")
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "No active aircraft!"})
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "No active aircraft!"})
 	}
 	activateResult, GetValErr := receiver.EventRedisService.GetVals(keys)
 	if GetValErr != nil {
@@ -182,7 +182,7 @@ func (receiver *RequestAircraft) ReceiveActiveIDs(ctx *fiber.Ctx) error {
 	}
 	if len(keys) == 0 {
 		utils.MsgError("        [ReceiveAircraft]ReceiveActiveIDs No active aircraft!")
-		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "No active aircraft!"})
+		return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "No active aircraft!"})
 	}
 	utils.MsgSuccess("        [ReceiveAircraft]ReceiveActiveIDs Successfully request activate Data!")
 	returnData := bson.M{"ActivateIDs": keys}
