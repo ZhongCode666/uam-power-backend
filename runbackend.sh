@@ -2,10 +2,6 @@
 
 echo "Build and run!"
 
-echo "Run python"
-~/uam-gis-intelligence-service/runservice.sh
-echo "run python successfully ~/uam-gis-intelligence-service/runservice.sh"
-
 redis-cli FLUSHALL
 echo "delete redis data successfully"
 echo "Creating kafka topic!"
@@ -73,5 +69,9 @@ done
 
 # 创建 latest_log 的快捷方式
 ln -sfn "$log_dir" "$HOME/uam-power-backend/logs/latest_log"
+
+echo "Run python"
+~/uam-gis-intelligence-service/runservice.sh
+echo "run python successfully ~/uam-gis-intelligence-service/runservice.sh"
 
 echo "All programs are running. Logs are saved in $log_dir, quick view with 'cd $HOME/uam-power-backend/logs/latest_log'"

@@ -91,11 +91,11 @@ func (taskModel *AircraftTaskModel) CreateTask(c *fiber.Ctx) error {
 	LaneMysqlRe, LaneMysqlErr := taskModel.MysqlService.QueryRow(
 		fmt.Sprintf("Select * from systemdb.lane_table where LaneID = %d;",
 			TaskInfo.LaneID))
-	if LaneMysqlRe != nil {
+	if LaneMysqlErr != nil {
 		utils.MsgError("        [AircraftTaskModel]CreateTask Query lane sql failed!")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "N.A.!"})
 	}
-	if LaneMysqlErr == nil {
+	if LaneMysqlRe == nil {
 		utils.MsgError("        [AircraftTaskModel]CreateTask No such Lane!")
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "No data found!"})
 	}
@@ -177,18 +177,18 @@ func (taskModel *AircraftTaskModel) EndTask(c *fiber.Ctx) error {
 		utils.MsgError("        [AircraftTaskModel]EndTask No such Task!")
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "No such Task!"})
 	}
-	//var mysqlData aircraft_task_model.MysqlAircraftTask
+	var mysqlData aircraft_task_model.MysqlAircraftTask
 	//// 将 Redis 数据转换为 JSON
-	//jsonData, _ := json.Marshal(re)
+	jsonData, _ := json.Marshal(re)
 	//// 将 JSON 数据解析为 MySQL 任务信息结构体
-	//err = json.Unmarshal(jsonData, &mysqlData)
-	//if err != nil {
-	//	utils.MsgError("        [AircraftTaskModel]EndTask Get Task ID failed!")
-	//	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "No such Task!"})
-	//}
+	err = json.Unmarshal(jsonData, &mysqlData)
+	if err != nil {
+		utils.MsgError("        [AircraftTaskModel]EndTask Get Task ID failed!")
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "No such Task!"})
+	}
 	// 更新 MySQL 中的任务结束时间
 	_, MysqlErr := taskModel.MysqlService.ExecuteCmd(
-		fmt.Sprintf("UPDATE systemdb.flight_task_table SET EndTime = '%s' WHERE AreaID = %d;",
+		fmt.Sprintf("UPDATE systemdb.flight_task_table SET EndTime = '%s' WHERE AircraftID = %d;",
 			utils.GetMySqlTimeStr(), aircraftReq.AircraftID,
 		),
 	)
