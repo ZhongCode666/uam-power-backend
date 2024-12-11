@@ -91,11 +91,11 @@ func (taskModel *AircraftTaskModel) CreateTask(c *fiber.Ctx) error {
 	LaneMysqlRe, LaneMysqlErr := taskModel.MysqlService.QueryRow(
 		fmt.Sprintf("Select * from systemdb.lane_table where LaneID = %d;",
 			TaskInfo.LaneID))
-	if LaneMysqlRe != nil {
+	if LaneMysqlErr != nil {
 		utils.MsgError("        [AircraftTaskModel]CreateTask Query lane sql failed!")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "N.A.!"})
 	}
-	if LaneMysqlErr == nil {
+	if LaneMysqlRe == nil {
 		utils.MsgError("        [AircraftTaskModel]CreateTask No such Lane!")
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "No data found!"})
 	}
