@@ -89,7 +89,7 @@ func (taskModel *AircraftTaskModel) CreateTask(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
 	LaneMysqlRe, LaneMysqlErr := taskModel.MysqlService.QueryRow(
-		fmt.Sprintf("Select * from systemdb.lane_table where LaneID = '%d';",
+		fmt.Sprintf("Select * from systemdb.lane_table where LaneID = %d;",
 			TaskInfo.LaneID))
 	if LaneMysqlRe != nil {
 		utils.MsgError("        [AircraftTaskModel]CreateTask Query lane sql failed!")
