@@ -28,7 +28,7 @@ func main() {
 	routes.SetupAircraftTypeRoutes(app, &cfg.MySqlCfg)
 	utils.MsgSuccess("[main_server]init routes successfully!")
 	// 启动服务器
-	if err := app.Listen(":" + strconv.Itoa(GlobalCfg.TaskPort)); err != nil {
+	if err := app.Listen(":" + strconv.Itoa(GlobalCfg.TypePort)); err != nil {
 		utils.MsgError("[main_server]Failed to run the server: %v")
 	}
 }
