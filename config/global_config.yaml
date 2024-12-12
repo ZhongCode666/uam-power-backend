@@ -7,4 +7,5 @@ IDPort: 27070 # ID 端口
 TaskPort: 27171 # 任务端口
 LanePort: 27272 # 车道端口
 AreaPort: 27373 # 区域端口
+TypePort: 27474 # 类型端口
 SaveLogToFile: False # 是否保存日志到文件

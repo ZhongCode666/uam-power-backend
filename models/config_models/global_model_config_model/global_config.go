@@ -8,6 +8,7 @@ type GlobalConfig struct {
 	DataReceivePort        int    `yaml:"DataReceivePort"`        // 数据接收端口
 	LanePort               int    `yaml:"LanePort"`               // 航线端口
 	AreaPort               int    `yaml:"AreaPort"`               // 区域端口
+	TypePort               int    `yaml:"TypePort"`               // 类型端口
 	SaveLogToFile          bool   `yaml:"SaveLogToFile"`          // 保存日志到文件
 	EventKafkaPartitionNum int    `yaml:"EventKafkaPartitionNum"` // 事件Kafka分区数
 	DataKafkaPartitionNum  int    `yaml:"DataKafkaPartitionNum"`  // 数据Kafka分区数
