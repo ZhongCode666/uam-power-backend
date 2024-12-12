@@ -5,15 +5,15 @@ import (
 )
 
 func Info(message string) {
-	print(fmt.Sprintf("%s %s☐ \n", GetTimeFmtStr(), message))
+	print(fmt.Sprintf("%s %s@ \n", GetTimeFmtStr(), message))
 }
 
 func Error(message string) {
-	print(fmt.Sprintf("%s %s☒ \n", GetTimeFmtStr(), message))
+	print(fmt.Sprintf("%s %s× \n", GetTimeFmtStr(), message))
 }
 
 func Success(message string) {
-	print(fmt.Sprintf("%s %s☑ \n", GetTimeFmtStr(), message))
+	print(fmt.Sprintf("%s %s√ \n", GetTimeFmtStr(), message))
 }
 
 func MsgError(msg string) {

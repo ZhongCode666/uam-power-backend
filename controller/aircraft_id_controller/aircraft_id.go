@@ -88,6 +88,19 @@ func (a *AircraftIdController) CreateUser(c *fiber.Ctx) error {
 		utils.MsgError("        [NewAircraftIdController]CreateUser invalid Requests Json!")
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
 	}
+
+	TypeMysqlRe, TypeMysqlErr := a.IDMySql.QueryRow(
+		fmt.Sprintf("Select * from systemdb.aircraft_style_table where Type = '%s';",
+			RequestInfo.Type))
+	if TypeMysqlErr != nil {
+		utils.MsgError("        [NewAircraftIdController]CreateUser Query type sql failed!")
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "N.A.!"})
+	}
+	if TypeMysqlRe == nil {
+		utils.MsgError("        [NewAircraftIdController]CreateUser No such type!")
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "No data found!"})
+	}
+
 	// 执行 MySQL 插入命令
 	_, err := a.IDMySql.ExecuteCmd(
 		fmt.Sprintf("INSERT INTO systemdb.aircraft_identity_table(Type, Company, Name, TimeStr) VALUES ('%s', '%s', '%s', '%s')",

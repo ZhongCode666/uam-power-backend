@@ -23,6 +23,7 @@ apis_gos=(
     "lane_route_main"
     "area_route_main"
     "receive_route_main"
+    "aircraft_type"
 )
 
 transfer_gos=(
