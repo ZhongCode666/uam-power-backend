@@ -155,12 +155,6 @@ func (laneModel *LaneController) GetLane(c *fiber.Ctx) error {
 // 返回值:
 // - error: 错误信息
 func (laneModel *LaneController) GetAllLane(c *fiber.Ctx) error {
-	var LaneInfo lane_model.FindLaneModel
-	// 解析请求体中的 JSON 数据
-	if err := c.BodyParser(&LaneInfo); err != nil {
-		utils.MsgError("        [LaneController]GetAllLane Invalid Request JSON data")
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
-	}
 	// 构造 MongoDB 查询过滤器
 	filter := bson.M{"IsHide": false}
 	// 指定要排除的字段
