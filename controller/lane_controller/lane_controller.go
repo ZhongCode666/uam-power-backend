@@ -296,3 +296,24 @@ func (laneModel *LaneController) DeleteLane(c *fiber.Ctx) error {
 	// 返回成功信息
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully delete Lanes!"})
 }
+
+func (laneModel *LaneController) QueryLaneInfo(c *fiber.Ctx) error {
+	var laneInfo lane_model.FindLaneModel
+	if err := c.BodyParser(&laneInfo); err != nil {
+		utils.MsgError("        [LaneController]QueryName Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+	}
+	re, err := laneModel.LaneMysql.QueryRow(
+		fmt.Sprintf("Select * from systemdb.lane_table where LaneID = %d;", laneInfo.LaneID))
+	if err != nil {
+		utils.MsgError("        [LaneController]QueryName failed!")
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Get data from mysql error"})
+	}
+	if re == nil {
+		utils.MsgError("        [LaneController]CreateLane find data failed")
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"msg": "N.A."})
+	}
+	utils.MsgSuccess("        [LaneController]QueryName Successfully GetLane!")
+	// 返回成功信息
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully return Lane!", "data": re})
+}

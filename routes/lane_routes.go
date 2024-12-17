@@ -29,6 +29,7 @@ func SetupLaneRoutes(
 	recApis.Post("/hide", laneController.HideLane)             // 隐藏航线
 	recApis.Post("/show", laneController.ShowLane)             // 显示航线
 	recApis.Post("/delete", laneController.DeleteLane)         // 删除航线
+	recApis.Post("/getLaneInfo", laneController.QueryLaneInfo) // 获取航线信息
 
 	// 打印成功初始化信息
 	utils.MsgSuccess("    [SetupDataLaneRoutes]Successfully init!")
