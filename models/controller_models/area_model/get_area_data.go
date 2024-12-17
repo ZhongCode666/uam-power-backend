@@ -4,3 +4,8 @@ package area_model
 type GetAreaData struct {
 	AreaID int `json:"AreaID"` // 区域ID
 }
+
+type GetRasterData struct {
+	AreaID int    `json:"AreaID"` // 区域ID
+	Status string `json:"Status"` // 区域ID
+}

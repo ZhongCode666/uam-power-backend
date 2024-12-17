@@ -31,6 +31,7 @@ func SetupAreaRoutes(
 	recApis.Post("/updateOK", areaController.UpdateRasterDataOK)           // 更新 OK 数据
 	recApis.Post("/updateBarrier", areaController.UpdateRasterDataBarrier) // 更新障碍数据
 	recApis.Post("/updateBan", areaController.UpdateRasterDataBan)         // 更新禁用数据
+	recApis.Post("/rasterData", areaController.GetRasterData)              // 获取栅格数据
 
 	// 打印成功初始化信息
 	utils.MsgSuccess("    [SetupDataAreaRoutes]Successfully init!")

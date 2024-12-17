@@ -411,3 +411,22 @@ func (ac *AreaController) DeleteAreaData(c *fiber.Ctx) error {
 	// 返回成功信息
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully DeleteAreaData!"})
 }
+
+func (ac *AreaController) GetRasterData(c *fiber.Ctx) error {
+	var GetRasterData area_model.GetRasterData
+	if err := c.BodyParser(&GetRasterData); err != nil {
+		utils.MsgError("        [AreaController]GetRasterData Invalid Request JSON data")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Invalid JSON data"})
+
+	}
+	re, err := ac.AreaMysql.QueryRows(
+		fmt.Sprintf("Select * from systemdb.raster_table where AreaID = %d and Status = '%s';",
+			GetRasterData.AreaID, GetRasterData.Status))
+	if err != nil {
+		utils.MsgError("        [AreaController]GetRasterData Query sql failed!")
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "N.A.!"})
+
+	}
+	utils.MsgSuccess("        [AreaController]GetRasterData Successfully GetRasterData!")
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully GetRasterData!", "data": re})
+}
