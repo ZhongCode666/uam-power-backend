@@ -427,6 +427,28 @@ func (ac *AreaController) GetRasterData(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "N.A.!"})
 
 	}
+	// 删除不必要的字段
+	delete(re, "AreaID")
+	delete(re, "RasterID")
+	delete(re, "Status")
+
+	filter := bson.M{"AreaID": GetRasterData.AreaID}
+	// 构造 MongoDB 查询字段排除器
+	drops := bson.M{"_id": 0, "AreaID": 0, "RasterData": 0, "RasterIndex": 0}
+	// 从 MongoDB 中查询数据
+	MRe, MErr := ac.AreaMongoDB.FindOneWithDropRow("area_collection", filter, drops)
+	if MErr != nil {
+		utils.MsgError("        [AreaController]GetRasterData Find raster size error!")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Find raster size failed"})
+	}
+	var reData area_model.GetRasterSizeMongo
+	jsonData, _ := json.Marshal(MRe)
+	err = json.Unmarshal(jsonData, &reData)
+	if err != nil {
+		utils.MsgError("        [AreaController]GetRasterData Unmarshal Json data failed")
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"msg": "Unmarshal Json data failed"})
+	}
+	re["RasterSize"] = reData.RasterSize
 	utils.MsgSuccess("        [AreaController]GetRasterData Successfully GetRasterData!")
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"msg": "Successfully GetRasterData!", "data": re})
 }
