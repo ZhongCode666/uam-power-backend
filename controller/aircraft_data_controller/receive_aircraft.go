@@ -164,7 +164,7 @@ func (receiver *RequestAircraft) ReceiveHistoryData(c *fiber.Ctx) error {
 		utils.MsgError("        [ReceiveAircraft]ReceiveHistoryData Unmarshal fail!")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Unmarshal fail!"})
 	}
-	rows, MysqlErr := receiver.FlightMysql.QueryRows(fmt.Sprintf("SELECT * FROM %s;", mysqlData.TrackTable))
+	rows, MysqlErr := receiver.FlightMysql.QueryRows(fmt.Sprintf("SELECT * FROM %s ORDER BY DataTime ASC;", mysqlData.TrackTable))
 	if MysqlErr != nil {
 		utils.MsgError("        [ReceiveAircraft]ReceiveHistoryData find data from mysql failed!")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Find data from mysql failed"})
@@ -212,7 +212,7 @@ func (receiver *RequestAircraft) ReceiveHistoryEvent(c *fiber.Ctx) error {
 		utils.MsgError("        [ReceiveAircraft]ReceiveHistoryEvent Unmarshal fail!")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Unmarshal fail!"})
 	}
-	rows, MysqlErr := receiver.EventMysql.QueryRows(fmt.Sprintf("SELECT * FROM %s;", mysqlData.EventTable))
+	rows, MysqlErr := receiver.EventMysql.QueryRows(fmt.Sprintf("SELECT * FROM %s ORDER BY DataTime ASC;", mysqlData.EventTable))
 	if MysqlErr != nil {
 		utils.MsgError("        [ReceiveAircraft]ReceiveHistoryEvent find Event from mysql failed!")
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"msg": "Find Event from mysql failed"})
